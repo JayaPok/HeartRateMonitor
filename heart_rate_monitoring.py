@@ -38,16 +38,16 @@ def estimate_heart_rate_oneminute():
     :returns: one minute average heart rate
     """
 
-    ECG_avg_HR_onemin = []
-    one_min_avg_array = []
+    ECG_avg_HR_onemin = []  # Array which will hold value of each local maxima ECG values for a 60 second period
+    one_min_avg_array = []  # Array which counts incidents in ECG_avg_HR_onemin array to be returned as one minute heart rate estimate
     i = 0
     while i < ECGData[1:].size-1:
         if ECGData[i] > ECGData[i-1] and ECGData[i] > ECGData[i+1]:
             ECG_avg_HR_onemin.append(ECGData[i])
-        if i % (60 * ECGSampFreqHz):
+        if i % (60 * ECGSampFreqHz): # Identifiying everytime 1 minute of data has passed
             array_ECG_avg_HR_onemin = np.array(ECG_avg_HR_onemin)
-            one_min_avg_array.append(array_ECG_avg_HR_onemin.size)
-            ECG_avg_HR_onemin = []
+            one_min_avg_array.append(array_ECG_avg_HR_onemin.size) # Adds heart rate during 60 seconds to cumulative one minute heart rate array
+            ECG_avg_HR_onemin = [] # Resets 60 second array
         i+=1
     return one_min_avg_array
 
@@ -59,16 +59,16 @@ def estimate_heart_rate_fiveminute():
     :returns: five minute average heart rate
     """
 
-    ECG_avg_HR_fivemin = []
-    five_min_avg_array = []
+    ECG_avg_HR_fivemin = [] # Array which will hold value of each local maxima ECG values for a 300 second period
+    five_min_avg_array = [] # Array which counts incidents in ECG_avg_HR_fivemin array to be returned as five minute heart rate estimate
     i = 0
     while i < ECGData[1:].size-1:
         if ECGData[i] > ECGData[i-1] and ECGData[i] > ECGData[i+1]:
             ECG_avg_HR_fivemin.append(ECGData[i])
-        if i % (300 * ECGSampFreqHz):
+        if i % (300 * ECGSampFreqHz):  # Identifiying everytime 5 minutess of data has passed
             array_ECG_avg_HR_fivemin = np.array(ECG_avg_HR_fivemin)
-            five_min_avg.append(array_ECG_avg_HR_fivemin.size / 5)
-            ECG_avg_HR_fivemin = []
+            five_min_avg.append(array_ECG_avg_HR_fivemin.size / 5) # Adds average heart rate during 300 seconds to cumulative five minute heart rate array
+            ECG_avg_HR_fivemin = [] # Resets 300 second array 
         i+=1
     return five_min_avg_array
 
@@ -78,11 +78,9 @@ def test_estimate_heart_rate():
     import numpy as np
     import matplotlib.pyplot as plt
 
-    #read_data()
-
     Fs = 20
-    sample = 100000
-    f = 5
+    sample = 50000
+    f = 3
     x = np.arange(sample)
     y = np.array(np.sin(2 * np.pi * f * x / Fs))
     #print(y)
@@ -93,13 +91,14 @@ def test_estimate_heart_rate():
     #plt.show()
 
     maxvalues_one = []
+    maxvalues_one_array = []
     i = 0
     while i < y.size-1:
         if y[i] > y[i-1] and y[i] > y[i+1]:
             maxvalues_one.append(y[i])
         if i%(60*Fs) == 0:
             maxvaluesarray_one = np.array(maxvalues_one)
-            one_min_avg = maxvaluesarray_one.size
+            maxvalues_one_array.append(maxvaluesarray_one.size)
             #print(one_min_avg)
             #return one_min_avg
             maxvalues_one = []
@@ -121,7 +120,7 @@ def test_estimate_heart_rate():
 
         i+=1
     
-    print(maxvalues_five_array)
+    print(maxvalues_one_array)
 
 test_estimate_heart_rate()
 
