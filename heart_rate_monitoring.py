@@ -39,19 +39,22 @@ def estimate_instantaenous_heart_rate():
     """
 
     instantaneous_HR_temp = [] # Array which holds temporary values of heart rates as data is read
+    instantaenous_HR_TenMin = []
     i=0
-    while i < y.size-1:
+    while i < ECGData.size-1:
         if ECGData[i] > ECGData[i-1] and ECGData[i] > ECGData[i+1]:
             instantaneous_HR_temp.append(ECGData[i])
-        if i % ECGSampFreqHz == 0: # Identifies everytime 1 second of data has passed
+        if i % (2 * ECGSampFreqHz) == 0: # Identifies everytime 2 seconds of data has passed
             instantaneous_HR_array = np.array(instantaneous_HR_temp)
-            instantaenous_HR = instantaneous_HR_array.size * 20
-            print(instantaenous_HR)
+            instantaenous_HR = instantaneous_HR_array.size * 30
+            instantaenous_HR_TenMin.append(instantaenous_HR)
+            #print(instantaenous_HR)
             if instantaenous_HR < 30:
                 print("Bradycardia alert!")
             if instantaenous_HR > 240:
                 print("Tachycardia alert!")
-            instantaneous_HR_temp = instantaneous_HR_temp[1:5] #Shifts array by one to get a rolling five second average heart rate shifting each second
+        #if i > (600 * ECGSampFreqHz):
+            #instantaenous_HR_TenMin = instantaenous_HR_TenMin[1:len(instantaenous_HR_TenMin)]
         i+=1    
     
 
@@ -146,21 +149,26 @@ def test_estimate_heart_rate():
     
     print(maxvalues_one_array)
 
-    instantaneous_HR_temp = []
+
+    instantaneous_HR_temp = [] # Array which holds temporary values of heart rates as data is read
+    instantaenous_HR_TenMin = []
     i=0
-    while i < y.size-1:
-        if y[i] > y[i-1] and y[i] > y[i+1]:
-            instantaneous_HR_temp.append(y[i])
-        if i % Fs == 0:
+    while i < ECGData.size-1:
+        if ECGData[i] > ECGData[i-1] and ECGData[i] > ECGData[i+1]:
+            instantaneous_HR_temp.append(ECGData[i])
+        if i % (2 * ECGSampFreqHz) == 0: # Identifies everytime 2 seconds of data has passed
             instantaneous_HR_array = np.array(instantaneous_HR_temp)
-            instantaenous_HR = instantaneous_HR_array.size * 20
-            #print(instantaenous_HR)
+            instantaenous_HR = instantaneous_HR_array.size * 30
+            instantaenous_HR_TenMin.append(instantaenous_HR)
+            print(instantaenous_HR)
             if instantaenous_HR < 30:
                 print("Bradycardia alert!")
             if instantaenous_HR > 240:
                 print("Tachycardia alert!")
-            instantaneous_HR_temp = instantaneous_HR_temp[1:5]
-        i+=1
+        #if i > (600 * ECGSampFreqHz):
+            #instantaenous_HR_TenMin = instantaenous_HR_TenMin[1:len(instantaenous_HR_TenMin)]
+        i+=1 
+
 
 test_estimate_heart_rate()
 
