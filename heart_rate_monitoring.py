@@ -12,7 +12,7 @@ def read_data(filename = "test.bin"):
     ECGSampFreqHz = ECGData[0]
     PlethSampFreqHz = PlethData[0]
 
-    return {'ECG_SampFreq':ECGSampFreqHz, 'Pleth_SampFreq':PlethSampFreqHz, 'ECG_Data':ECGData, 'Pleth_Data':PlethData}
+   # return {'ECG_SampFreq':ECGSampFreqHz, 'Pleth_SampFreq':PlethSampFreqHz, 'ECG_Data':ECGData, 'Pleth_Data':PlethData}
 
 
 with open('test.bin', 'rb') as filename:
@@ -31,31 +31,56 @@ with open('test.bin', 'rb') as filename:
     print(PlethSampFreqHz)
 
 
-def estimate_instantaenous_heart_rate():
+def heart_rate_indicies():
     """ estimate instantaneous heart rate
     
     :param signal: input signal from read_data()
     :returns: instantenous heart rate from 5 second interval
     """
 
-    instantaneous_HR_temp = [] # Array which holds temporary values of heart rates as data is read
-    instantaenous_HR_TenMin = []
+    instantaneous_HR_indicies = [] # Array which holds temporary values of heart rates as data is read
     i=0
     while i < ECGData.size-1:
-        if ECGData[i] > ECGData[i-1] and ECGData[i] > ECGData[i+1]:
-            instantaneous_HR_temp.append(ECGData[i])
-        if i % (2 * ECGSampFreqHz) == 0: # Identifies everytime 2 seconds of data has passed
-            instantaneous_HR_array = np.array(instantaneous_HR_temp)
-            instantaenous_HR = instantaneous_HR_array.size * 30
-            instantaenous_HR_TenMin.append(instantaenous_HR)
-            #print(instantaenous_HR)
-            if instantaenous_HR < 30:
-                print("Bradycardia alert!")
-            if instantaenous_HR > 240:
-                print("Tachycardia alert!")
-        #if i > (600 * ECGSampFreqHz):
-            #instantaenous_HR_TenMin = instantaenous_HR_TenMin[1:len(instantaenous_HR_TenMin)]
-        i+=1    
+        if ECGData[i] > np.median(ECGData[i-2-int(ECGSampFreqHz/16):i+5-int(ECGSampFreqHz/16):1]) and ECGData[i] > np.median(ECGData[i-2+int(ECGSampFreqHz/16):i+5+int(ECGSampFreqHz/16):1]):
+            instantaneous_HR_indicies.append(i)
+        i+=1
+    return instantaneous_HR_indicies
+
+
+def estimate_instantaneous_HR():
+    heart_rate_indicies()
+    
+    all_HR = []
+    while k < instantaneous_HR_indicies.size:
+        instantaenous_HR = (60 * ECGSampFreqHz) / (ECGData[k+1] - ECGData[k])
+        all_HR.append(instantaenous_HR)
+        return instantaenous_HR
+        if instantaenous_HR < 30:
+            print("Bradycardia alert! Here is 10 minute trace of heart rate:")
+            invertedHR = all_HR[::-1]
+            HR_sum = 0
+            for x in xrange(0, k):
+                HR_sum = HR_sum + invertedHR[x]
+                if HR_sum > 600:
+                    ten_min_invert = invertedHR[0:x]
+                    ten_min_real = ten_min_invert[::-1]
+                    print(ten_min_real)
+                    break
+        if instantaenous_HR > 240:
+            print("Tachycardia alert! Here is 10 minute trace of heart rate:")
+            invertedHR = all_HR[::-1]
+            HR_sum = 0
+            for x in xrange(0, k):
+                HR_sum = HR_sum + invertedHR[x]
+                if HR_sum > 600:
+                    ten_min_invert = invertedHR[0:x]
+                    ten_min_real = ten_min_invert[::-1]
+                    print(ten_min_real)
+                    break
+        k+=1
+
+def HR_alert():
+
     
 
 def estimate_heart_rate_oneminute():
