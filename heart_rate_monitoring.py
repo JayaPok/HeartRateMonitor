@@ -20,7 +20,7 @@ def test_read_data():
 
     :param: read_data() "
     :returns: true/false whether return values in read_data function is equal to the expected values"""    
-    read_data()
+    ECGSampFreqHz, PlethSampFreqHz, ECGData, PlethData  = read_data()
     import numpy as np
     
     assert read_data() == (770, 1284, [770], [1284])
