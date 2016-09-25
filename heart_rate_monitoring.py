@@ -15,15 +15,17 @@ def read_data(filename = "test.bin"):
     return ECGSampFreqHz, PlethSampFreqHz, ECGData, PlethData   
 
 
-def test_read_data():
+def test_read_data(filename = "test.bin"):
     """ read in raw data from binary file
 
     :param: read_data() "
     :returns: true/false whether return values in read_data function is equal to the expected values"""    
-    ECGSampFreqHz, PlethSampFreqHz, ECGData, PlethData  = read_data()
     import numpy as np
     
-    assert read_data() == (770, 1284, [770], [1284])
+    data = np.fromfile(filename, dtype = 'uint16')
+    
+
+    assert (2, 3, 4) ==  (data[1], data[2], data[3])
 
 # with open('test.bin', 'rb') as filename:
 #     import numpy as np
@@ -41,35 +43,34 @@ def test_read_data():
 #     print(PlethSampFreqHz)
 
 
-def heart_rate_indicies_ECG():
+def heart_rate_indicies_ECG(ECGData):
     """ estimate indicies of ECG peaks
     
     :param signal: ECG sampling frequencies and sampling values array from read_data()
     :returns: indicies of peaks in ECG sampling values array
     """
-    read_data()
 
     instantaneous_HR_indicies_ECG = [] # Array which holds temporary values of heart rates as data is read
-    i=0
-    while i < ECGData.size:
-        if ECGData[i] > np.median(ECGData[(i-2-int(ECGSampFreqHz/16)):(i+5-int(ECGSampFreqHz/16))]) and ECGData[i] > np.median(ECGData[(i-2+int(ECGSampFreqHz/16)):(i+5+int(ECGSampFreqHz/16))]):
+    i=1
+    while i < ECGData.size-1:
+        if ECGData[i] > ECGData[i-1] and ECGData[i] > ECGData[i+1]:
             instantaneous_HR_indicies_ECG.append(i)
         i+=1
     
     return instantaneous_HR_indicies_ECG
 
-def heart_rate_indicies_Plethysmograph():
+def heart_rate_indicies_Plethysmograph(PlethData):
+
     """ estimate indicies of ECG peaks
     
     :param signal: Plethysmograph sampling frequencies and sampling values array from read_data()
     :returns: indicies of peaks in ECG sampling values array
     """
-    read_data()
 
     instantaneous_HR_indicies_Pleth = [] # Array which holds temporary values of heart rates as data is read
-    i=0
-    while i < PlethData.size:
-        if PlethData[i] > np.median(PlethData[(i-2-int(PlethSampFreqHz/16)):(i+5-int(PlethSampFreqHz/16))]) and PlethData[i] > np.median(PlethData[(i-2+int(PlethSampFreqHz/16)):(i+5+int(PlethSampFreqHz/16))]):
+    i=1
+    while i < PlethData.size-1:
+        if PlethData[i] > PlethData[i-1] and PlethData[i] > PlethData[i+1]:
             instantaneous_HR_indicies_Pleth.append(i)
         i+=1
     
@@ -93,7 +94,6 @@ def estimate_instantaneous_HR():
     :param signal: input signal from read_data() and input peak index values from heart_rate_indicies()
     :returns: 
     """
-    read_data()
     heart_rate_indicies()
     
     # all_HR_ECG = []
@@ -163,7 +163,6 @@ def estimate_heart_rate_oneminute_index():
     :param signal: input signal from read_data()
     :returns: one minute average heart rate
     """
-    read_data()
 
     one_minute_HR_Pleth = []
     k = 0
@@ -196,7 +195,6 @@ def estimate_heart_rate_fiveminute_index():
     :param signal: input signal from read_data()
     :returns: one minute average heart rate
     """
-    read_data()
 
     five_minute_HR_Pleth = []
     k = 0
@@ -269,22 +267,24 @@ def estimate_heart_rate_fiveminute_index():
 
 
 def test_instantaneous_HR():
-    read_data()
 
     import numpy as np
-    Fs = 20
-    sample = 50000
-    f = 3
+    Fs = 8000
+    sample = 8000
+    f = 5
     x = np.arange(sample)
     y = np.array(np.sin(2 * np.pi * f * x / Fs))
+    a = 0
 
     instantaneous_HR_indicies = [] # Array which holds temporary values of heart rates as data is read
-    i=0
-    while i < y.size:
-        if y[i] > np.median(y[(i-2-int(Fs/16)):(i+5-int(Fs/16))]) and y[i] > np.median(y[(i-2+int(Fs/16)):(i+5+int(Fs/16))]):
+    i=6
+    while i < y.size-6:
+        #if y[i] > np.mean(y[i-1:i-5]) and y[i] > np.mean(y[i+1:i+5]):
+        if y[i] > y[i-1] and y[i] > y[i+1]:
             instantaneous_HR_indicies.append(i)
-            #print(y[i])
+            print(y[i])
         i+=1
+    # assert instantaneous_HR_indicies == [1, 1, 1, 1, 1]
 
 
     one_minute_HR = []
