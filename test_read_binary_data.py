@@ -1,10 +1,11 @@
 from heart_rate_monitoring import read_data
 
 def test_read_data():
-    """ read in raw data from binary file
+    """ test read_data file
 
-    :param: read_data() "
-    :returns: true/false whether return values in read_data function is equal to the expected values"""    
+    :param signal: filename = "test.bin"
+    :returns: ECG Sampling Frequency, Pulse Plethysmograph Sampling Frequency, ECG sampling values array, Pulse Plethysmograph sampling values array """ 
+
     import numpy as np
     
     ECGSampFreqHz, PlethSampFreqHz, ECGData, PlethData  = read_data("test.bin")
