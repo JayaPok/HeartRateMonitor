@@ -17,4 +17,4 @@ def test_estimate_heart_rate_fiveminute_index():
     instantaneous_HR_indicies_Pleth = heart_rate_indicies_Plethysmograph(y)
     one_minute_total_HR_Pleth = estimate_heart_rate_fiveminute_index(instantaneous_HR_indicies_Pleth, Fs)
 
-    assert one_minute_total_HR_Pleth == 300.2
+    assert one_minute_total_HR_Pleth == [300.2]
