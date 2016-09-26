@@ -1,52 +1,29 @@
-def read_data(filename = "test.bin"):
-    """ read in raw data from binary file
+def read_data(filename):
+    """ read in raw data from binary file inputted by user
 
-    :param filename: filename = "test.bin"
+    :param filename: filename = ""
     :returns: ECG Sampling Frequency, Pulse Plethysmograph Sampling Frequency, ECG sampling values array, Pulse Plethysmograph sampling values array """ 
     import numpy as np
+
     data = np.fromfile(filename, dtype = 'uint16')
 
-    ECGData = np.array(data[::2])
-    PlethData = np.array(data[1::2])
+
+    ECGAllData = np.array(data[0::2])
+    PlethAllData = np.array(data[1::2])
     
-    ECGSampFreqHz = ECGData[0]
-    PlethSampFreqHz = PlethData[0]
+    ECGSampFreqHz = ECGAllData[0]
+    PlethSampFreqHz = PlethAllData[0]
     
+    ECGData = np.array(data[2::2])
+    PlethData = np.array(data[3::2])
+
     return ECGSampFreqHz, PlethSampFreqHz, ECGData, PlethData   
-
-
-def test_read_data(filename = "test.bin"):
-    """ read in raw data from binary file
-
-    :param: read_data() "
-    :returns: true/false whether return values in read_data function is equal to the expected values"""    
-    import numpy as np
-    
-    data = np.fromfile(filename, dtype = 'uint16')
-    
-
-    assert (2, 3, 4) ==  (data[1], data[2], data[3])
-
-# with open('test.bin', 'rb') as filename:
-#     import numpy as np
-#     data = np.fromfile(filename, dtype = 'uint16')
-#     print(data)
-
-#     ECGData = np.array(data[::2])
-#     PlethData = np.array(data[1::2])
-#     print(ECGData)
-#     print(PlethData)
-    
-#     ECGSampFreqHz = ECGData[0]
-#     PlethSampFreqHz = PlethData[0]
-#     print(ECGSampFreqHz)
-#     print(PlethSampFreqHz)
 
 
 def heart_rate_indicies_ECG(ECGData):
     """ estimate indicies of ECG peaks
     
-    :param signal: ECG sampling frequencies and sampling values array from read_data()
+    :param signal: ECG sampling values array from read_data()
     :returns: indicies of peaks in ECG sampling values array
     """
 
@@ -60,11 +37,10 @@ def heart_rate_indicies_ECG(ECGData):
     return instantaneous_HR_indicies_ECG
 
 def heart_rate_indicies_Plethysmograph(PlethData):
-
-    """ estimate indicies of ECG peaks
+    """ estimate indicies of Plethysmograph peaks
     
-    :param signal: Plethysmograph sampling frequencies and sampling values array from read_data()
-    :returns: indicies of peaks in ECG sampling values array
+    :param signal: Plethysmograph sampling values array from read_data()
+    :returns: indicies of peaks in Plethysmograph sampling values array
     """
 
     instantaneous_HR_indicies_Pleth = [] # Array which holds temporary values of heart rates as data is read
@@ -80,39 +56,9 @@ def heart_rate_indicies_Plethysmograph(PlethData):
 def estimate_instantaneous_HR(instantaneous_HR_indicies_Pleth, PlethSampFreqHz):
     """ estimate instantaneous heart rate
 
-    :param signal: input signal from read_data() and input peak index values from heart_rate_indicies()
-    :returns: 
+    :param signal: input peak index values from heart_rate_indicies() and plethysmograph sampling frequency from read_data()
+    :returns: instantaneous HR, alert, and 10 minute log of instantaneous heart rate
     """
-    
-    # all_HR_ECG = []
-    # k = 0
-    # while k < len(instantaneous_HR_indicies_ECG)-1:
-    #     instantaenous_HR_ECG = ((60 * ECGSampFreqHz) / (instantaneous_HR_indicies_ECG[k+1] - instantaneous_HR_indicies_ECG[k])) # calculates instantaenous HR for each beat
-    #     all_HR_ECG.append(instantaenous_HR_ECG)
-    #     if instantaenous_HR_ECG < 30: # detects for Bradycardia where heart rate is below 30 bpm
-    #         invertedHR_ECG = np.array(all_HR_ECG[::-1])
-    #         invertedHRseconds_ECG = 1 / (invertedHR_ECG / 60)
-    #         HR_sum = 0
-    #         for x in range(0, k):
-    #             HR_sum_ECG = HR_sum_ECG + invertedHRseconds_ECG[x]
-    #             ten_min_invert_ECG = invertedHR_ECG[0:x]
-    #             ten_min_real_ECG = np.array(ten_min_invert_ECG[::-1])
-    #             if np.sum(ten_min_real_ECG) > 600:
-    #                 return "Bradycardia alert! Here is 10 minute trace of heart rate:",  ten_min_real_ECG
-    #                 break
-    #     if instantaenous_HR_ECG > 240: # detects for Bradycardia where heart rate is above 240 bpm
-    #         invertedHR_ECG = np.array(all_HR_ECG[::-1])
-    #         invertedHRseconds_ECG = 1 / (invertedHR_ECG / 60)
-    #         HR_sum_ECG = 0
-    #         for x in range(0, k):
-    #             HR_sum_ECG = HR_sum_ECG + invertedHRseconds_ECG[x]
-    #             ten_min_invert_ECG = invertedHR_ECG[0:x]
-    #             ten_min_real_ECG = np.array(ten_min_invert_ECG[::-1])
-    #             if np.sum(ten_min_real_ECG) > 600:
-    #                 return "Tachycardia alert! Here is 10 minute trace of heart rate:", ten_min_real_ECG
-    #                 break
-    #     return instantaenous_HR_ECG
-    #     k+=1
     import numpy as np
 
     all_HR_Pleth = []
@@ -129,7 +75,8 @@ def estimate_instantaneous_HR(instantaneous_HR_indicies_Pleth, PlethSampFreqHz):
                 ten_min_invert_Pleth = invertedHR_Pleth[0:x]
                 ten_min_real_Pleth = np.array(ten_min_invert_Pleth[::-1])
                 if np.sum(ten_min_real_Pleth) > 600:
-                    return "Bradycardia alert! Here is 10 minute trace of heart rate:",  ten_min_real_Pleth
+                    print("Bradycardia alert! Here is 10 minute trace of heart rate:")
+                    return ten_min_real_Pleth
                     break
         if instantaenous_HR_Pleth > 240: # detects for Bradycardia where heart rate is above 240 bpm
             invertedHR_Pleth = np.array(all_HR_Pleth[::-1])
@@ -140,7 +87,8 @@ def estimate_instantaneous_HR(instantaneous_HR_indicies_Pleth, PlethSampFreqHz):
                 ten_min_invert_Pleth = invertedHR_Pleth[0:x]
                 ten_min_real_Pleth = np.array(ten_min_invert_Pleth[::-1])
                 if np.sum(ten_min_real_Pleth) > 600:
-                    return "Tachycardia alert! Here is 10 minute trace of heart rate:", ten_min_real_Pleth
+                    print("Tachycardia alert! Here is 10 minute trace of heart rate:")
+                    return ten_min_real_Pleth
                     break
         return instantaenous_HR_Pleth
         k+=1        
@@ -149,10 +97,9 @@ def estimate_instantaneous_HR(instantaneous_HR_indicies_Pleth, PlethSampFreqHz):
 def estimate_heart_rate_oneminute_index(instantaneous_HR_indicies_Pleth, PlethSampFreqHz):
     """ estimate one minute average heart rate
 
-    :param signal: input signal from read_data()
+    :param signal: input peak index values from heart_rate_indicies() and plethysmograph sampling frequency from read_data()
     :returns: one minute average heart rate
     """
-
     one_minute_HR_Pleth = []
     k = 0
     while k < len(instantaneous_HR_indicies_Pleth)-1:
@@ -165,24 +112,12 @@ def estimate_heart_rate_oneminute_index(instantaneous_HR_indicies_Pleth, PlethSa
             return one_minute_total_HR_Pleth
         k+=1
     
-    # one_minute_HR = []
-    # k = 0
-    # while k < len(instantaneous_HR_indicies)-1:
-    #     time_between_beats = (instantaneous_HR_indicies[k+1] - instantaneous_HR_indicies[k]) / ECGSampFreqHz
-    #     one_minute_HR.append(time_between_beats)
-    #     one_minute_HR_sum = sum(one_minute_HR)
-    #     if one_minute_HR_sum > 60:
-    #         one_minute_total_HR =  len(one_minute_HR)
-    #         one_minute_HR = []
-    #         return one_minute_total_HR
-    #     k+=1
-
 
 def estimate_heart_rate_fiveminute_index(instantaneous_HR_indicies_Pleth, PlethSampFreqHz):
-    """ estimate one minute average heart rate
+    """ estimate five minute average heart rate
 
-    :param signal: input signal from read_data()
-    :returns: one minute average heart rate
+    :param signal: input peak index values from heart_rate_indicies() and plethysmograph sampling frequency from read_data()
+    :returns: five minute average heart rate
     """
 
     five_minute_HR_Pleth = []
@@ -196,63 +131,6 @@ def estimate_heart_rate_fiveminute_index(instantaneous_HR_indicies_Pleth, PlethS
             five_minute_HR_Pleth = []
             return five_minute_total_HR_Pleth
         k+=1
-    
-    # five_minute_HR = []
-    # k = 0
-    # while k < len(instantaneous_HR_indicies)-1:
-    #     time_between_beats = (instantaneous_HR_indicies[k+1] - instantaneous_HR_indicies[k]) / ECGSampFreqHz
-    #     five_minute_HR.append(time_between_beats)
-    #     five_minute_HR_sum = sum(five_minute_HR)
-    #     if five_minute_HR_sum > 300:
-    #         five_minute_total_HR =  len(five_minute_HR)
-    #         five_minute_HR = []
-    #         return five_minute_total_HR
-    #     k+=1
-
-
-
-# def estimate_heart_rate_oneminute():
-#     """ estimate one minute average heart rate
-
-#     :param signal: input signal from read_data()
-#     :returns: one minute average heart rate
-#     """
-#     read_data()
-
-#     ECG_avg_HR_onemin = []  # Array which will hold value of each local maxima ECG values for a 60 second period
-#     one_min_avg_array = []  # Array which counts incidents in ECG_avg_HR_onemin array to be returned as one minute heart rate estimate
-#     i = 0
-#     while i < ECGData[1:].size:
-#         if ECGData[i] > np.median(ECGData[(i-2-int(ECGSampFreqHz/16)):(i+5-int(ECGSampFreqHz/16))]) and ECGData[i] > np.median(ECGData[(i-2+int(ECGSampFreqHz/16)):(i+5+int(ECGSampFreqHz/16))]):
-#             ECG_avg_HR_onemin.append(ECGData[i])
-#         if i % (60 * ECGSampFreqHz) == 0: # Identifiying everytime 1 minute of data has passed
-#             array_ECG_avg_HR_onemin = np.array(ECG_avg_HR_onemin)
-#             one_min_avg_array.append(array_ECG_avg_HR_onemin.size) # Adds heart rate during 60 seconds to cumulative one minute heart rate array
-#             ECG_avg_HR_onemin = [] # Resets 60 second array
-#         i+=1
-#     return one_min_avg_array
-
-
-# def estimate_heart_rate_fiveminute():
-#     """ estimate five minute average heart rate
-
-#     :param signal: input signal from read_data()
-#     :returns: five minute average heart rate
-#     """
-#     read_data()
-#     ECG_avg_HR_fivemin = [] # Array which will hold value of each local maxima ECG values for a 300 second period
-#     five_min_avg_array = [] # Array which counts incidents in ECG_avg_HR_fivemin array to be returned as five minute heart rate estimate
-#     i = 0
-#     while i < ECGData[1:].size:
-#         if ECGData[i] > np.median(ECGData[(i-2-int(ECGSampFreqHz/16)):(i+5-int(ECGSampFreqHz/16))]) and ECGData[i] > np.median(ECGData[(i-2+int(ECGSampFreqHz/16)):(i+5+int(ECGSampFreqHz/16))]):
-#             ECG_avg_HR_fivemin.append(ECGData[i])
-#         if i % (300 * ECGSampFreqHz) == 0:  # Identifiying everytime 5 minutess of data has passed
-#             array_ECG_avg_HR_fivemin = np.array(ECG_avg_HR_fivemin)
-#             five_min_avg.append(array_ECG_avg_HR_fivemin.size / 5) # Adds average heart rate during 300 seconds to cumulative five minute heart rate array
-#             ECG_avg_HR_fivemin = [] # Resets 300 second array 
-#         i+=1
-#     return five_min_avg_array
-
 
 
 def test_instantaneous_HR():
