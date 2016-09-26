@@ -1,7 +1,11 @@
 from heart_rate_monitoring import heart_rate_indicies_ECG, heart_rate_indicies_Plethysmograph
 
 def test_instantaneous_HR_indicies():
+    """ test instantaneous_HR_indicies() method
 
+    :param signal: input sine wave
+    :returns: assertion of expected 0 indicies of peaks in sine wave against the measured values from using test instantaneous_HR_indicies() method
+    """
     import numpy as np
     Fs = 80
     sample = 80
