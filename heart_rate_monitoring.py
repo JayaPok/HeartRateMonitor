@@ -76,25 +76,13 @@ def heart_rate_indicies_Plethysmograph(PlethData):
     
     return instantaneous_HR_indicies_Pleth
 
-# def test_yo():
-#     import numpy as np
-#     import pandas as pd
-#     a = np.array([1, 2, 3, np.nan, 4, np.nan])
-#     i = 0
-#     while i < a.size:
-#         if pd.isnull(a[i]) == True:
-#             continue
-#         print(a[i])
-#         i+=1
-# test_yo()
 
-def estimate_instantaneous_HR():
+def estimate_instantaneous_HR(instantaneous_HR_indicies_Pleth, PlethSampFreqHz):
     """ estimate instantaneous heart rate
 
     :param signal: input signal from read_data() and input peak index values from heart_rate_indicies()
     :returns: 
     """
-    heart_rate_indicies()
     
     # all_HR_ECG = []
     # k = 0
@@ -125,6 +113,7 @@ def estimate_instantaneous_HR():
     #                 break
     #     return instantaenous_HR_ECG
     #     k+=1
+    import numpy as np
 
     all_HR_Pleth = []
     k = 0
@@ -157,7 +146,7 @@ def estimate_instantaneous_HR():
         k+=1        
 
     
-def estimate_heart_rate_oneminute_index():
+def estimate_heart_rate_oneminute_index(instantaneous_HR_indicies_Pleth, PlethSampFreqHz):
     """ estimate one minute average heart rate
 
     :param signal: input signal from read_data()
@@ -189,7 +178,7 @@ def estimate_heart_rate_oneminute_index():
     #     k+=1
 
 
-def estimate_heart_rate_fiveminute_index():
+def estimate_heart_rate_fiveminute_index(instantaneous_HR_indicies_Pleth, PlethSampFreqHz):
     """ estimate one minute average heart rate
 
     :param signal: input signal from read_data()
@@ -282,7 +271,7 @@ def test_instantaneous_HR():
         #if y[i] > np.mean(y[i-1:i-5]) and y[i] > np.mean(y[i+1:i+5]):
         if y[i] > y[i-1] and y[i] > y[i+1]:
             instantaneous_HR_indicies.append(i)
-            print(y[i])
+            #print(y[i])
         i+=1
     # assert instantaneous_HR_indicies == [1, 1, 1, 1, 1]
 
@@ -300,37 +289,37 @@ def test_instantaneous_HR():
         k+=1
 
     #print(instantaneous_HR_indicies)
-    # all_HR = []
-    # k = 0
-    # while k < len(instantaneous_HR_indicies)-1:
-    #     instantaenous_HR = ((60 * Fs) / (instantaneous_HR_indicies[k+1] - instantaneous_HR_indicies[k])) # calculates instantaenous HR for each beat
-    #     all_HR.append(instantaenous_HR)
-    #     #print(instantaenous_HR)
-    #     if instantaenous_HR < 30: # detects for Bradycardia where heart rate is below 30 bpm
-    #         print("Bradycardia alert! Here is 10 minute trace of heart rate:")
-    #         invertedHR = np.array(all_HR[::-1])
-    #         invertedHRseconds = 1 / (invertedHR / 60)
-    #         HR_sum = 0
-    #         for x in range(0, k):
-    #             HR_sum = HR_sum + invertedHRseconds[x]
-    #             ten_min_invert = invertedHR[0:x]
-    #             ten_min_real = np.array(ten_min_invert[::-1])
-    #             if np.sum(ten_min_real) > 600:
-    #                 print(ten_min_real)
-    #                 break
-    #     if instantaenous_HR > 240: # detects for Bradycardia where heart rate is above 240 bpm
-    #         print("Tachycardia alert! Here is 10 minute trace of heart rate:")
-    #         invertedHR = np.array(all_HR[::-1])
-    #         invertedHRseconds = 1 / (invertedHR / 60)
-    #         HR_sum = 0
-    #         for x in range(0, k):
-    #             HR_sum = HR_sum + invertedHRseconds[x]
-    #             ten_min_invert = invertedHR[0:x]
-    #             ten_min_real = np.array(ten_min_invert[::-1])
-    #             if np.sum(ten_min_real) > 600:
-    #                 print(ten_min_real)
-    #                 break
-    #     k+=1
+    all_HR = []
+    k = 0
+    while k < len(instantaneous_HR_indicies)-1:
+        instantaenous_HR = ((60 * Fs) / (instantaneous_HR_indicies[k+1] - instantaneous_HR_indicies[k])) # calculates instantaenous HR for each beat
+        all_HR.append(instantaenous_HR)
+        print(instantaenous_HR)
+        if instantaenous_HR < 30: # detects for Bradycardia where heart rate is below 30 bpm
+            #print("Bradycardia alert! Here is 10 minute trace of heart rate:")
+            invertedHR = np.array(all_HR[::-1])
+            invertedHRseconds = 1 / (invertedHR / 60)
+            HR_sum = 0
+            for x in range(0, k):
+                HR_sum = HR_sum + invertedHRseconds[x]
+                ten_min_invert = invertedHR[0:x]
+                ten_min_real = np.array(ten_min_invert[::-1])
+                if np.sum(ten_min_real) > 600:
+                    print(ten_min_real)
+                    break
+        if instantaenous_HR > 240: # detects for Bradycardia where heart rate is above 240 bpm
+            #print("Tachycardia alert! Here is 10 minute trace of heart rate:")
+            invertedHR = np.array(all_HR[::-1])
+            invertedHRseconds = 1 / (invertedHR / 60)
+            HR_sum = 0
+            for x in range(0, k):
+                HR_sum = HR_sum + invertedHRseconds[x]
+                ten_min_invert = invertedHR[0:x]
+                ten_min_real = np.array(ten_min_invert[::-1])
+                if np.sum(ten_min_real) > 600:
+                    print(ten_min_real)
+                    break
+        k+=1
 
 test_instantaneous_HR()
 
