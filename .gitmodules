@@ -1,0 +1,3 @@
+[submodule "BMC"]
+	path = BMC
+	url = https://github.com/demotu/BMC
