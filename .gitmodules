@@ -1,3 +1,6 @@
 [submodule "BMC"]
 	path = BMC
 	url = https://github.com/demotu/BMC
+[submodule "submodule_test"]
+	path = submodule_test
+	url = git@gitlab.oit.duke.edu:medical-device-software-design/submodule_test.git
