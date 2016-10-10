@@ -16,5 +16,8 @@ def test_instantaneous_HR_indicies():
     instantaneous_HR_indicies_ECG = heart_rate_indicies_ECG(y)
     instantaneous_HR_indicies_Pleth = heart_rate_indicies_Plethysmograph(y)
 
-    assert instantaneous_HR_indicies_ECG == [4, 20, 36, 52, 68]
-    assert instantaneous_HR_indicies_Pleth == [4, 20, 36, 52, 68]
+    assert instantaneous_HR_indicies_ECG[0] == 4
+    assert instantaneous_HR_indicies_ECG[1] == 20
+    assert instantaneous_HR_indicies_ECG[2] == 36
+    assert instantaneous_HR_indicies_ECG[3] == 52
+    assert instantaneous_HR_indicies_ECG[4] == 68
