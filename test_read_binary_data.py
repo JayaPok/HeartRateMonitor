@@ -1,4 +1,4 @@
-from heart_rate_monitoring import read_data
+from heart_rate_monitoring import find_sampfreq
 
 def test_read_data():
     """ test read_data file
@@ -7,11 +7,8 @@ def test_read_data():
     :returns: ECG Sampling Frequency, Pulse Plethysmograph Sampling Frequency, ECG sampling values array, Pulse Plethysmograph sampling values array """ 
 
     import numpy as np
-    
-    ECGSampFreqHz, PlethSampFreqHz, ECGData, PlethData  = read_data("test.bin")
 
-    assert ECGSampFreqHz == 770
-    assert PlethSampFreqHz == 1284
-    assert ECGData == [1798]
-    assert PlethData == [2312]
+    SampFreq = find_sampfreq("test.bin")
+    
+    assert SampFreq == 770
 

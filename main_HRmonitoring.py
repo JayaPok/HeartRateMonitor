@@ -1,60 +1,58 @@
-from heart_rate_monitoring import read_data, heart_rate_indicies_ECG, heart_rate_indicies_Plethysmograph, \
-estimate_instantaneous_HR, estimate_heart_rate_oneminute_index, estimate_heart_rate_fiveminute_index
+from heart_rate_monitoring import read_data, find_sampfreq, obtain_ECG, obtain_Pleth, heart_rate_ECG_insta, heart_rate_Pleth_insta, \
+estimate_instantaneous_HR, alert_brady, alert_tachy, one_min_avg, five_min_avg
+import collections
 
 if __name__ == "__main__":
-    """ run all functions of heart_rate_monitoring file as well as input a time increment and run values simultaneously
+    """ run all functions of heart_rate_monitoring file
+    
+    :param: binary multiplexed data file
+    :returns: prints instantaneous heart rate, one minute heart rate, five minute heart rate, and heart rate log in the case of alert """ 
+    
+    file = "test1.bin"
 
-    :param: none
-    :returns: prints instantaneous heart rate, one minute heart rate, and five minute heart rate """ 
+    SampFreq = find_sampfreq(file)
 
-    ECGSampFreqHz, PlethSampFreqHz, ECGData, PlethData = read_data()
-    instantaneous_HR_indicies_ECG = heart_rate_indicies_ECG(ECGData)
-    instantaneous_HR_indicies_Pleth = instantaneous_HR_indicies_Pleth(PlethData)
-    instantaenous_HR_Pleth = estimate_instantaneous_HR(instantaneous_HR_indicies_Pleth, PlethSampFreqHz)
-    one_minute_total_HR_Pleth = estimate_heart_rate_oneminute_index(instantaneous_HR_indicies_Pleth, PlethSampFreqHz)
-    five_minute_total_HR_Pleth = estimate_heart_rate_fiveminute_index(instantaneous_HR_indicies_Pleth, PlethSampFreqHz)
+    tenmin_log = collections.deque([], maxlen = 60)
+    onemin_avg_log = collections.deque([], maxlen = 6)
+    fivemin_avg_log = collections.deque([], maxlen = 30)
+    iteration = 1
 
-    import time
-    from threading import Thread
+    while(iteration < 100):
+        tensec_data = read_data(file, SampFreq, iteration)
+        ECGData = obtain_ECG(tensec_data)
+        PlethData = obtain_Pleth(tensec_data)
+        
+        ten_sec_info_ECG = heart_rate_ECG_insta(ECGData)
+        ten_sec_info_Pleth = heart_rate_Pleth_insta(PlethData)
 
-    def run_instantaneous_HR():
-    """ run instantaneous heart rate array at a time increment
+        tensec_info_avg = (ten_sec_info_ECG + ten_sec_info_Pleth) / 2
 
-    :param: none
-    :returns: prints instantaneous heart rate at the exact time delay of the heart beat """ 
-        i = 0
-        while i < len(instantaenous_HR_Pleth):
-            print("Instantaneous heart rate: ", instantaenous_HR_Pleth[i])
-            sec_per_beat = 60 / instantaenous_HR_Pleth[i]
-            time.sleep(sec_per_beat)
-            i+=1
- 
-    def run_one_minute_instantaneous():
-    """ run one minute heart rate average and displays every minute
+        instantaneous_HR = estimate_instantaneous_HR(tensec_info_avg)
+        tenmin_log.append(instantaneous_HR)
+        onemin_avg_log.append(instantaneous_HR)
+        fivemin_avg_log.append(instantaneous_HR)
+        
+        print("Ten second instantaneous heart rate is %d." % instantaneous_HR)
+        
+        if(instantaneous_HR < 30):
+            tenmin_log_brady = alert_brady(tenmin_log)
+            print("Alert, bradycardia detected! Here is 10 minute backlog: ")
+            print(tenmin_log_brady)
 
-    :param: none
-    :returns: prints one minute heart rate average """ 
-        j = 0
-        while j < len(one_minute_total_HR_Pleth):
-            print("One minute average heart rate: ", one_minute_total_HR_Pleth)
-            time.sleep(60)
-            j+=1
+        if(instantaneous_HR > 240):
+            tenmin_log_tachy = alert_tachy(tenmin_log)
+            print("Alert, tachycardia detected! Here is 10 minute backlog: ")
+            print(tenmin_log_tachy)
 
-    def run_five_minute_instantaneous():
-    """ run five minute heart rate average and displays every minute
+        if(len(onemin_avg_log) == 6):
+            onemin_avg = one_min_avg(onemin_avg_log)
+            print(onemin_avg)
+            onemin_avg_log.clear()
 
-    :param: none
-    :returns: prints five minute heart rate average """ 
-        k = 0
-        while k < len(five_minute_total_HR_Pleth):
-            print("Five minute average heart rate: ", five_minute_total_HR_Pleth)
-            time.sleep(300)
-            k+=1
+        if(len(fivemin_avg_log) == 30):
+            fivemin_avg = five_min_avg(fivemin_avg_log)
+            print(fivemin_avg)
+            fivemin_avg_log.clear()
+        
+        iteration += 1
 
-    run1 = Thread(target = run_instantaneous_HR)
-    run2 = Thread(target = run_one_minute_instantaneous)
-    run3 = Thread(target = run_five_minute_instantaneous)	 
-
-    run1.start()
-    run2.start()
-    run3.start()
