@@ -8,6 +8,8 @@ def parse_cli():
     par = ap.ArgumentParser(description = "run program for inputted binary file", formatter_class = ap.ArgumentDefaultsHelpFormatter)
 
     par.add_argument("--file", dest = "file", help="input binary file")
+    par.add_argument("--brady", dest = "brady", help="input bradycardia starting heart rate", type = int)
+    par.add_argument("--tachy", dest = "tachy", help="input tachycardia starting heart rate", type = int)
 
 
     args = par.parse_args()
@@ -19,8 +21,10 @@ def main():
     args = parse_cli()
 
     file = args.file
+    brady = args.brady
+    tachy = args.tachy
 
-    return file
+    return file, brady, tachy
 
 
 if __name__ == "__main__":
@@ -29,7 +33,7 @@ if __name__ == "__main__":
     :param: binary multiplexed data file
     :returns: prints instantaneous heart rate, one minute heart rate, five minute heart rate, and heart rate log in the case of alert """ 
     
-    file = main()
+    file, brady, tachy = main()
 
     SampFreq = find_sampfreq(file)
 
