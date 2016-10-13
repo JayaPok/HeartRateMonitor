@@ -8,11 +8,11 @@ def parse_cli():
     par = ap.ArgumentParser(description = "run program for inputted binary file", formatter_class = ap.ArgumentDefaultsHelpFormatter)
 
     par.add_argument("--file", dest = "file", help="input binary file", type = str)
-    par.add_argument("--brady", dest = "brady", help="input bradycardia starting heart rate", type = int)
-    par.add_argument("--tachy", dest = "tachy", help="input tachycardia starting heart rate", type = int)
+    par.add_argument("--brady", dest = "brady", help="input bradycardia starting heart rate", type = int, default = 30)
+    par.add_argument("--tachy", dest = "tachy", help="input tachycardia starting heart rate", type = int, default = 240)
     par.add_argument("--signal", dest = "signal", help="input ECG for ECG signal HR estimation, PLETH for Plethysmograph HR estimation, \
-     or BOTH for an average of both signals HR estimation", type = str)
-    par.add_argument("--usermin", dest = "usermin", help="input desired multi-minute heart rate average", type = int)
+     or BOTH for an average of both signals HR estimation", type = str, default = "BOTH")
+    par.add_argument("--usermin", dest = "usermin", help="input desired multi-minute heart rate average", type = int, default = 2)
 
     args = par.parse_args()
 
@@ -68,7 +68,7 @@ if __name__ == "__main__":
         fivemin_avg_log.append(instantaneous_HR)
         usermin_avg_log.append(instantaneous_HR)
         
-        print("Ten second instantaneous heart rate is %d." % instantaneous_HR)
+        print("10 second instantaneous heart rate is %d." % instantaneous_HR)
         
         if(instantaneous_HR < brady):
             tenmin_log_brady = alert_brady(tenmin_log)
@@ -82,17 +82,17 @@ if __name__ == "__main__":
 
         if(len(onemin_avg_log) == 6):
             onemin_avg = some_min_avg(onemin_avg_log)
-            print(onemin_avg)
+            print("1 minute average heart rate is %d." % onemin_avg)
             onemin_avg_log.clear()
 
         if(len(fivemin_avg_log) == 30):
             fivemin_avg = some_min_avg(fivemin_avg_log)
-            print(fivemin_avg)
+            print("5 minute average heart rate is %d." % fivemin_avg)
             fivemin_avg_log.clear()
 
         if(len(usermin_avg_log) == (usermin*6)):
             usermin_avg = some_min_avg(usermin_avg_log)
-            print(usermin_avg)
+            print("%d minute average heart rate is %d." % (usermin, usermin_avg))
             usermin_avg_log.clear()
         
         iteration += 1
