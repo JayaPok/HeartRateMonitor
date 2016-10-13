@@ -2,13 +2,34 @@ from heart_rate_monitoring import read_data, find_sampfreq, obtain_ECG, obtain_P
 estimate_instantaneous_HR, alert_brady, alert_tachy, one_min_avg, five_min_avg
 import collections
 
+def parse_cli():
+    import argparse as ap
+
+    par = ap.ArgumentParser(description = "run program for inputted binary file", formatter_class = ap.ArgumentDefaultsHelpFormatter)
+
+    par.add_argument("--file", dest = "file", help="input binary file")
+
+
+    args = par.parse_args()
+
+    return args
+
+
+def main():
+    args = parse_cli()
+
+    file = args.file
+
+    return file
+
+
 if __name__ == "__main__":
     """ run all functions of heart_rate_monitoring file
     
     :param: binary multiplexed data file
     :returns: prints instantaneous heart rate, one minute heart rate, five minute heart rate, and heart rate log in the case of alert """ 
     
-    file = "test1.bin"
+    file = main()
 
     SampFreq = find_sampfreq(file)
 
@@ -17,7 +38,7 @@ if __name__ == "__main__":
     fivemin_avg_log = collections.deque([], maxlen = 30)
     iteration = 1
 
-    while(iteration < 100):
+    while(iteration < 1000):
         tensec_data = read_data(file, SampFreq, iteration)
         ECGData = obtain_ECG(tensec_data)
         PlethData = obtain_Pleth(tensec_data)
@@ -34,12 +55,12 @@ if __name__ == "__main__":
         
         print("Ten second instantaneous heart rate is %d." % instantaneous_HR)
         
-        if(instantaneous_HR < 30):
+        if(instantaneous_HR < brady):
             tenmin_log_brady = alert_brady(tenmin_log)
             print("Alert, bradycardia detected! Here is 10 minute backlog: ")
             print(tenmin_log_brady)
 
-        if(instantaneous_HR > 240):
+        if(instantaneous_HR > tachy):
             tenmin_log_tachy = alert_tachy(tenmin_log)
             print("Alert, tachycardia detected! Here is 10 minute backlog: ")
             print(tenmin_log_tachy)
