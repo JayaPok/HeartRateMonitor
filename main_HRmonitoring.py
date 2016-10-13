@@ -1,5 +1,5 @@
 from heart_rate_monitoring import read_data, find_sampfreq, obtain_ECG, obtain_Pleth, heart_rate_ECG_insta, heart_rate_Pleth_insta, \
-estimate_instantaneous_HR, alert_brady, alert_tachy, one_min_avg, five_min_avg
+estimate_instantaneous_HR, alert_brady, alert_tachy, some_min_avg
 import collections
 
 def parse_cli():
@@ -10,7 +10,7 @@ def parse_cli():
     par.add_argument("--file", dest = "file", help="input binary file")
     par.add_argument("--brady", dest = "brady", help="input bradycardia starting heart rate", type = int)
     par.add_argument("--tachy", dest = "tachy", help="input tachycardia starting heart rate", type = int)
-
+    par.add_argument("--usermin", dest = "usermin", help="input desired multi-minute heart rate average", type = int)
 
     args = par.parse_args()
 
@@ -23,8 +23,9 @@ def main():
     file = args.file
     brady = args.brady
     tachy = args.tachy
+    usermin = args.usermin
 
-    return file, brady, tachy
+    return file, brady, tachy, usermin
 
 
 if __name__ == "__main__":
@@ -33,15 +34,16 @@ if __name__ == "__main__":
     :param: binary multiplexed data file
     :returns: prints instantaneous heart rate, one minute heart rate, five minute heart rate, and heart rate log in the case of alert """ 
     
-    file, brady, tachy = main()
+    file, brady, tachy, usermin = main()
 
     SampFreq = find_sampfreq(file)
 
     tenmin_log = collections.deque([], maxlen = 60)
     onemin_avg_log = collections.deque([], maxlen = 6)
     fivemin_avg_log = collections.deque([], maxlen = 30)
-    iteration = 1
+    usermin_avg_log = collections.deque([], maxlen = (usermin*6))
 
+    iteration = 1
     while(iteration < 1000):
         tensec_data = read_data(file, SampFreq, iteration)
         ECGData = obtain_ECG(tensec_data)
@@ -56,6 +58,7 @@ if __name__ == "__main__":
         tenmin_log.append(instantaneous_HR)
         onemin_avg_log.append(instantaneous_HR)
         fivemin_avg_log.append(instantaneous_HR)
+        usermin_avg_log.append(instantaneous_HR)
         
         print("Ten second instantaneous heart rate is %d." % instantaneous_HR)
         
@@ -70,14 +73,19 @@ if __name__ == "__main__":
             print(tenmin_log_tachy)
 
         if(len(onemin_avg_log) == 6):
-            onemin_avg = one_min_avg(onemin_avg_log)
+            onemin_avg = some_min_avg(onemin_avg_log)
             print(onemin_avg)
             onemin_avg_log.clear()
 
         if(len(fivemin_avg_log) == 30):
-            fivemin_avg = five_min_avg(fivemin_avg_log)
+            fivemin_avg = some_min_avg(fivemin_avg_log)
             print(fivemin_avg)
             fivemin_avg_log.clear()
+
+        if(len(usermin_avg_log) == (usermin*6)):
+            usermin_avg = some_min_avg(usermin_avg_log)
+            print(usermin_avg)
+            usermin_avg_log.clear()
         
         iteration += 1
 

@@ -124,27 +124,17 @@ def alert_tachy(tenmin_log):
 
     return tenmin_log_tachy
 
-def one_min_avg(onemin_avg_log):
-    """ one minute average heart rate calculation
+def some_min_avg(somemin_avg_log):
+    """ some minute average heart rate calculation
 
-    :param signal: one minute heart rate back log
-    :returns: one minute heart rate
+    :param signal: some minute heart rate back log
+    :returns: some minute heart rate
     """
     
-    onemin_avg = sum(onemin_avg_log) / len(onemin_avg_log)
+    somemin_avg = sum(somemin_avg_log) / len(somemin_avg_log)
 
-    return onemin_avg
+    return somemin_avg
 
-def five_min_avg(fivemin_avg_log):
-    """ five minute average heart rate calculation
-
-    :param signal: five minute heart rate back log
-    :returns: five minute heart rate
-    """
-    
-    fivemin_avg = sum(fivemin_avg_log) / len(fivemin_avg_log)
-
-    return fivemin_avg
 
 
 
