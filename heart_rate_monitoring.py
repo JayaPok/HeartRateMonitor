@@ -28,8 +28,10 @@ def find_sampfreq(filename):
     :param: binary file
     :returns: ECG and Pulse sampling frequency  """ 
     f = open(filename, "rb")
-    data = f.read(2)
-    SampFreq = int.from_bytes(data, byteorder = 'little')
+    SampFreqPulse = f.read(2)
+    SampFreqECG = f.read(2)
+    
+    SampFreq = int.from_bytes(SampFreqPulse, byteorder = 'little')
 
     return SampFreq
 

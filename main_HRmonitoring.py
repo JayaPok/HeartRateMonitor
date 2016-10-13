@@ -7,9 +7,11 @@ def parse_cli():
 
     par = ap.ArgumentParser(description = "run program for inputted binary file", formatter_class = ap.ArgumentDefaultsHelpFormatter)
 
-    par.add_argument("--file", dest = "file", help="input binary file")
+    par.add_argument("--file", dest = "file", help="input binary file", type = str)
     par.add_argument("--brady", dest = "brady", help="input bradycardia starting heart rate", type = int)
     par.add_argument("--tachy", dest = "tachy", help="input tachycardia starting heart rate", type = int)
+    par.add_argument("--signal", dest = "signal", help="input ECG for ECG signal HR estimation, PLETH for Plethysmograph HR estimation, \
+     or BOTH for an average of both signals HR estimation", type = str)
     par.add_argument("--usermin", dest = "usermin", help="input desired multi-minute heart rate average", type = int)
 
     args = par.parse_args()
@@ -23,9 +25,10 @@ def main():
     file = args.file
     brady = args.brady
     tachy = args.tachy
+    signal = args.signal
     usermin = args.usermin
 
-    return file, brady, tachy, usermin
+    return file, brady, tachy, signal, usermin
 
 
 if __name__ == "__main__":
@@ -34,7 +37,7 @@ if __name__ == "__main__":
     :param: binary multiplexed data file
     :returns: prints instantaneous heart rate, one minute heart rate, five minute heart rate, and heart rate log in the case of alert """ 
     
-    file, brady, tachy, usermin = main()
+    file, brady, tachy, signal, usermin = main()
 
     SampFreq = find_sampfreq(file)
 
@@ -52,7 +55,12 @@ if __name__ == "__main__":
         ten_sec_info_ECG = heart_rate_ECG_insta(ECGData)
         ten_sec_info_Pleth = heart_rate_Pleth_insta(PlethData)
 
-        tensec_info_avg = (ten_sec_info_ECG + ten_sec_info_Pleth) / 2
+        if(signal == "ECG"):
+            tensec_info_avg = ten_sec_info_ECG
+        elif(signal == "PLETH"):
+            tensec_info_avg = ten_sec_info_Pleth
+        else:
+            tensec_info_avg = (ten_sec_info_ECG + ten_sec_info_Pleth) / 2
 
         instantaneous_HR = estimate_instantaneous_HR(tensec_info_avg)
         tenmin_log.append(instantaneous_HR)
