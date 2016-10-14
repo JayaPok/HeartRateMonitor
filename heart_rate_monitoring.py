@@ -9,11 +9,11 @@ def read_data(filename, SampFreq, iteration):
     import numpy as np
     
     f = open(filename, "rb")
-    f.seek(2*(10*SampFreq*iteration))
+    f.seek(2*(10*iteration))
     tensec_data = []
     i = 0
 
-    while(i < 20*SampFreq):
+    while(i < 20):
         data = f.read(2)
         tensec_data.append(int.from_bytes(data, byteorder = 'little'))
         f.seek(0, 1)
@@ -63,9 +63,14 @@ def heart_rate_ECG_insta(ECGData):
     """
 
     instantaneous_HR_indicies_ECG = [] # Array which holds temporary values of heart rates as data is read
-    i=1
-    while i < ECGData.size-1:
-        if ECGData[i] > ECGData[i-1] and ECGData[i] > ECGData[i+1]:
+
+    i=6
+    while i < ECGData.size-6:
+        ECGbefore = np.average(np.array(ECGData[i-1, i-2, i-3, i-4, i-5]))
+
+        ECGafter = np.average(np.array(ECGData[i+1, i+2, i+3, i+4, i+5]))
+
+        if ECGData[i] > ECGbefore and ECGData[i] > ECGafter:
             instantaneous_HR_indicies_ECG.append(i)
         i+=1
     
