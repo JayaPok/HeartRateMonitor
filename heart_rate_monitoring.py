@@ -9,11 +9,11 @@ def read_data(filename, SampFreq, iteration):
     import numpy as np
     
     f = open(filename, "rb")
-    f.seek(2*(10*iteration))
+    f.seek(2*(10*SampFreq*iteration))
     tensec_data = []
     i = 0
 
-    while(i < 20):
+    while(i < 20*SampFreq):
         data = f.read(2)
         tensec_data.append(int.from_bytes(data, byteorder = 'little'))
         f.seek(0, 1)
@@ -58,7 +58,7 @@ def obtain_Pleth(tensec_data):
 def heart_rate_ECG_insta(ECGData):
     """ estimate number of peaks in 10 second ECG data
     
-    :param signal: 10 second ECG data
+    :param: 10 second ECG data
     :returns: 10 second ECG heart rate
     """
 
@@ -77,7 +77,7 @@ def heart_rate_ECG_insta(ECGData):
 def heart_rate_Pleth_insta(PlethData):
     """ estimate number of peaks in 10 second Pleth data
     
-    :param signal: 10 second Pleth data
+    :param: 10 second Pleth data
     :returns: 10 second Pleth heart rate
     """
 
@@ -95,7 +95,7 @@ def heart_rate_Pleth_insta(PlethData):
 def estimate_instantaneous_HR(ten_sec_info_avg):
     """ estimate 10 second instantaneous heart rate
 
-    :param signal: 10 second average of ECG and Pulse HR data
+    :param: 10 second average of ECG and Pulse HR data
     :returns: instantaneous averaged heart rate
     """
     import numpy as np
@@ -107,7 +107,7 @@ def estimate_instantaneous_HR(ten_sec_info_avg):
 def alert_brady(tenmin_log):
     """ bradycardia alert
 
-    :param signal: ten minute heart rate back log
+    :param: ten minute heart rate back log
     :returns: ten minute heart rate back log
     """
     
@@ -118,7 +118,7 @@ def alert_brady(tenmin_log):
 def alert_tachy(tenmin_log):
     """ tachycardia alert
 
-    :param signal: ten minute heart rate back log
+    :param: ten minute heart rate back log
     :returns: ten minute heart rate back log
     """
     
@@ -129,7 +129,7 @@ def alert_tachy(tenmin_log):
 def some_min_avg(somemin_avg_log):
     """ some minute average heart rate calculation
 
-    :param signal: some minute heart rate back log
+    :param: some minute heart rate back log
     :returns: some minute heart rate
     """
     
