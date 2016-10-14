@@ -1,6 +1,7 @@
 from heart_rate_monitoring import read_data, find_sampfreq, obtain_ECG, obtain_Pleth, heart_rate_ECG_insta, heart_rate_Pleth_insta, \
 estimate_instantaneous_HR, alert_brady, alert_tachy, some_min_avg
 import collections
+import os
 
 def parse_cli():
     """ argparse capabilites that enables user to input values to change output
@@ -54,8 +55,18 @@ if __name__ == "__main__":
     fivemin_avg_log = collections.deque([], maxlen = 30)
     usermin_avg_log = collections.deque([], maxlen = (usermin*6))
 
+    f = open(file, "rb")
+    f.seek(0, os.SEEK_END)
+    size = f.tell()
+
+
     iteration = 1
-    while(iteration < 1000):
+    continuerun = True
+    
+    while continuerun:
+        if ((20*SampFreq*iteration) > size):
+            continuerun = False
+
         tensec_data = read_data(file, SampFreq, iteration)
         ECGData = obtain_ECG(tensec_data)
         PlethData = obtain_Pleth(tensec_data)
