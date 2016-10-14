@@ -3,6 +3,10 @@ estimate_instantaneous_HR, alert_brady, alert_tachy, some_min_avg
 import collections
 
 def parse_cli():
+    """ argparse capabilites that enables user to input values to change output
+    
+    :param: user inputed values for one or more of filename, bradycardia threshold, tachycardia threshold, signal type, and desired minute HR average
+    :returns: returns args arguments for main method() """ 
     import argparse as ap
 
     par = ap.ArgumentParser(description = "run program for inputted binary file", formatter_class = ap.ArgumentDefaultsHelpFormatter)
@@ -20,6 +24,10 @@ def parse_cli():
 
 
 def main():
+    """ run all functions of heart_rate_monitoring file
+    
+    :param: arg arguments from argparse
+    :returns: user inputed variables to be inputed into code for specific responses """ 
     args = parse_cli()
 
     file = args.file
