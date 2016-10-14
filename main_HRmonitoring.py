@@ -102,6 +102,6 @@ if __name__ == "__main__":
             usermin_avg = some_min_avg(usermin_avg_log)
             print("%d minute average heart rate is %d." % (usermin, usermin_avg))
             usermin_avg_log.clear()
-        
+
         iteration += 1
 
