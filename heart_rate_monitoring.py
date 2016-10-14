@@ -9,11 +9,11 @@ def read_data(filename, SampFreq, iteration):
     import numpy as np
     
     f = open(filename, "rb")
-    f.seek(2*(10*iteration))
+    f.seek(2*(10*SampFreq*iteration))
     tensec_data = []
     i = 0
 
-    while(i < 20):
+    while(i < 20*SampFreq):
         data = f.read(2)
         tensec_data.append(int.from_bytes(data, byteorder = 'little'))
         f.seek(0, 1)
