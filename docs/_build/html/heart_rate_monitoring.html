@@ -1,0 +1,257 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>heart_rate_monitoring module &mdash; HR Monitor 1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="HR Monitor 1 documentation" href="index.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-heart_rate_monitoring">
+<span id="heart-rate-monitoring-module"></span><h1>heart_rate_monitoring module<a class="headerlink" href="#module-heart_rate_monitoring" title="Permalink to this headline">¶</a></h1>
+<dl class="function">
+<dt id="heart_rate_monitoring.alert_brady">
+<code class="descclassname">heart_rate_monitoring.</code><code class="descname">alert_brady</code><span class="sig-paren">(</span><em>tenmin_log</em><span class="sig-paren">)</span><a class="headerlink" href="#heart_rate_monitoring.alert_brady" title="Permalink to this definition">¶</a></dt>
+<dd><p>bradycardia alert</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Param:</th><td class="field-body">ten minute heart rate back log</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">ten minute heart rate back log</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="heart_rate_monitoring.alert_tachy">
+<code class="descclassname">heart_rate_monitoring.</code><code class="descname">alert_tachy</code><span class="sig-paren">(</span><em>tenmin_log</em><span class="sig-paren">)</span><a class="headerlink" href="#heart_rate_monitoring.alert_tachy" title="Permalink to this definition">¶</a></dt>
+<dd><p>tachycardia alert</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Param:</th><td class="field-body">ten minute heart rate back log</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">ten minute heart rate back log</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="heart_rate_monitoring.estimate_instantaneous_HR">
+<code class="descclassname">heart_rate_monitoring.</code><code class="descname">estimate_instantaneous_HR</code><span class="sig-paren">(</span><em>ten_sec_info_avg</em><span class="sig-paren">)</span><a class="headerlink" href="#heart_rate_monitoring.estimate_instantaneous_HR" title="Permalink to this definition">¶</a></dt>
+<dd><p>estimate 10 second instantaneous heart rate</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Param:</th><td class="field-body">10 second average of ECG and Pulse HR data</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">instantaneous averaged heart rate</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="heart_rate_monitoring.find_sampfreq">
+<code class="descclassname">heart_rate_monitoring.</code><code class="descname">find_sampfreq</code><span class="sig-paren">(</span><em>filename</em><span class="sig-paren">)</span><a class="headerlink" href="#heart_rate_monitoring.find_sampfreq" title="Permalink to this definition">¶</a></dt>
+<dd><p>find sampling frequency from the first values of the binary file</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Param:</th><td class="field-body">binary file</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">ECG and Pulse sampling frequency</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="heart_rate_monitoring.heart_rate_ECG_insta">
+<code class="descclassname">heart_rate_monitoring.</code><code class="descname">heart_rate_ECG_insta</code><span class="sig-paren">(</span><em>ECGData</em><span class="sig-paren">)</span><a class="headerlink" href="#heart_rate_monitoring.heart_rate_ECG_insta" title="Permalink to this definition">¶</a></dt>
+<dd><p>estimate number of peaks in 10 second ECG data</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Param:</th><td class="field-body">10 second ECG data</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">10 second ECG heart rate</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="heart_rate_monitoring.heart_rate_Pleth_insta">
+<code class="descclassname">heart_rate_monitoring.</code><code class="descname">heart_rate_Pleth_insta</code><span class="sig-paren">(</span><em>PlethData</em><span class="sig-paren">)</span><a class="headerlink" href="#heart_rate_monitoring.heart_rate_Pleth_insta" title="Permalink to this definition">¶</a></dt>
+<dd><p>estimate number of peaks in 10 second Pleth data</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Param:</th><td class="field-body">10 second Pleth data</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">10 second Pleth heart rate</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="heart_rate_monitoring.obtain_ECG">
+<code class="descclassname">heart_rate_monitoring.</code><code class="descname">obtain_ECG</code><span class="sig-paren">(</span><em>tensec_data</em><span class="sig-paren">)</span><a class="headerlink" href="#heart_rate_monitoring.obtain_ECG" title="Permalink to this definition">¶</a></dt>
+<dd><p>obtain ECG values of ten second data</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Param:</th><td class="field-body">multiplexed ECG and Pleth data</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">ECG data</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="heart_rate_monitoring.obtain_Pleth">
+<code class="descclassname">heart_rate_monitoring.</code><code class="descname">obtain_Pleth</code><span class="sig-paren">(</span><em>tensec_data</em><span class="sig-paren">)</span><a class="headerlink" href="#heart_rate_monitoring.obtain_Pleth" title="Permalink to this definition">¶</a></dt>
+<dd><p>obtain Pulse Pleth values of ten second data</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Param:</th><td class="field-body">multiplexed ECG and Pleth data</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Pleth data</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="heart_rate_monitoring.read_data">
+<code class="descclassname">heart_rate_monitoring.</code><code class="descname">read_data</code><span class="sig-paren">(</span><em>filename</em>, <em>SampFreq</em>, <em>iteration</em><span class="sig-paren">)</span><a class="headerlink" href="#heart_rate_monitoring.read_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>read in raw data from binary file inputted by user</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Param:</th><td class="field-body">binary file, sampling frequency, and iteration number of loop in main method</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">ten second data of binary file based on iteration</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="heart_rate_monitoring.some_min_avg">
+<code class="descclassname">heart_rate_monitoring.</code><code class="descname">some_min_avg</code><span class="sig-paren">(</span><em>somemin_avg_log</em><span class="sig-paren">)</span><a class="headerlink" href="#heart_rate_monitoring.some_min_avg" title="Permalink to this definition">¶</a></dt>
+<dd><p>some minute average heart rate calculation</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Param:</th><td class="field-body">some minute heart rate back log</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">some minute heart rate</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/heart_rate_monitoring.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, Jaya Pokuri.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.3.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.8</a>
+      
+      |
+      <a href="_sources/heart_rate_monitoring.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
