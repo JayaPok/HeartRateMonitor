@@ -48,6 +48,8 @@ if __name__ == "__main__":
     
     file, brady, tachy, signal, usermin = main()
 
+    logging.basicConfig(level=logging.INFO, filename="log.txt", format='%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p')
+
     SampFreq = find_sampfreq(file)
 
     tenmin_log = collections.deque([], maxlen = 60)
