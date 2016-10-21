@@ -128,9 +128,9 @@ def heart_rate_ECG_insta(ECGData):
 
     i=6
     while i < ECGData.size-6:
-        ECGbefore = np.average(np.array(ECGData[(i-5):(i-1)]))
+        ECGbefore = np.average(np.array(ECGData[i-1, i-2, i-3, i-4, i-5]))
 
-        ECGafter = np.average(np.array(ECGData[(i+1):(i+5)]))
+        ECGafter = np.average(np.array(ECGData[i+1, i+2, i+3, i+4, i+5]))
 
         if ECGData[i] > ECGbefore and ECGData[i] > ECGafter:
             instantaneous_HR_indicies_ECG.append(i)
@@ -151,9 +151,9 @@ def heart_rate_Pleth_insta(PlethData):
     instantaneous_HR_indicies_Pleth = [] # Array which holds temporary values of heart rates as data is read
     i=6
     while i < PlethData.size-6:
-        Plethbefore = np.average(np.array(PlethData[(i-5):(i-1)]))
+        Plethbefore = np.average(np.array(PlethData[i-1, i-2, i-3, i-4, i-5]))
 
-        Plethafter = np.average(np.array(PlethData[(i+1):(i+5)]))
+        Plethafter = np.average(np.array(PlethData[i+1, i+2, i+3, i+4, i+5]))
 
         if PlethData[i] > Plethbefore and PlethData[i] > Plethafter:
             instantaneous_HR_indicies_Pleth.append(i)
