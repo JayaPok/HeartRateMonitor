@@ -9,4 +9,4 @@ def test_filetypes():
     matlab_sampfreq = find_sampfreq('matvals.mat')
 
     assert binary_sampfreq == 20000
-    assert matlab_sampfreq == 16717
+    assert matlab_sampfreq == 100
