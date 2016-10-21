@@ -149,16 +149,12 @@ def heart_rate_Pleth_insta(PlethData):
     """
 
     instantaneous_HR_indicies_Pleth = [] # Array which holds temporary values of heart rates as data is read
-    i=6
-    while i < PlethData.size-6:
-        Plethbefore = np.average(np.array(PlethData[i-1, i-2, i-3, i-4, i-5]))
-
-        Plethafter = np.average(np.array(PlethData[i+1, i+2, i+3, i+4, i+5]))
-
-        if PlethData[i] > Plethbefore and PlethData[i] > Plethafter:
+    i=1
+    while i < PlethData.size-1:
+        if PlethData[i] > PlethData[i-1] and PlethData[i] > PlethData[i+1]:
             instantaneous_HR_indicies_Pleth.append(i)
         i+=1
-    
+
     ten_sec_info_Pleth = len(instantaneous_HR_indicies_Pleth)
     
     return ten_sec_info_Pleth
