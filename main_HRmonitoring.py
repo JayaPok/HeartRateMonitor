@@ -73,75 +73,66 @@ if __name__ == "__main__":
     iteration = 1
     continuerun = True
     
-    try:
-        while continuerun:
-            if ((20*iteration) > size):
-                continuerun = False
+    while continuerun:
+        if ((20*iteration) > size):
+            continuerun = False
 
-            tensec_data = read_data(file, SampFreq, iteration)
-            ECGData = obtain_ECG(tensec_data)
-            PlethData = obtain_Pleth(tensec_data)
+        tensec_data = read_data(file, SampFreq, iteration)
+        ECGData = obtain_ECG(tensec_data)
+        PlethData = obtain_Pleth(tensec_data)
         
-            ten_sec_info_ECG = heart_rate_ECG_insta(ECGData)
-            ten_sec_info_Pleth = heart_rate_Pleth_insta(PlethData)
+        ten_sec_info_ECG = heart_rate_ECG_insta(ECGData)
+        ten_sec_info_Pleth = heart_rate_Pleth_insta(PlethData)
 
-            if(signal == "ECG"):
-                tensec_info_avg = ten_sec_info_ECG
-            elif(signal == "PLETH"):
-                tensec_info_avg = ten_sec_info_Pleth
-            else:
-                tensec_info_avg = (ten_sec_info_ECG + ten_sec_info_Pleth) / 2
+        if(signal == "ECG"):
+            tensec_info_avg = ten_sec_info_ECG
+        elif(signal == "PLETH"):
+            tensec_info_avg = ten_sec_info_Pleth
+        else:
+            tensec_info_avg = (ten_sec_info_ECG + ten_sec_info_Pleth) / 2
 
-            instantaneous_HR = estimate_instantaneous_HR(tensec_info_avg)
-            tenmin_log.append(instantaneous_HR)
-            onemin_avg_log.append(instantaneous_HR)
-            fivemin_avg_log.append(instantaneous_HR)
-            usermin_avg_log.append(instantaneous_HR)
+        instantaneous_HR = estimate_instantaneous_HR(tensec_info_avg)
+        tenmin_log.append(instantaneous_HR)
+        onemin_avg_log.append(instantaneous_HR)
+        fivemin_avg_log.append(instantaneous_HR)
+        usermin_avg_log.append(instantaneous_HR)
         
-            print("10 second instantaneous heart rate is %d bmp." % instantaneous_HR)
-            logging.info("10 sec inst. HR: %d bpm" % instantaneous_HR)
+        print("10 second instantaneous heart rate is %d bmp." % instantaneous_HR)
+        logging.info("10 sec inst. HR: %d bpm" % instantaneous_HR)
         
-            if(instantaneous_HR < brady):
-                tenmin_log_brady = alert_brady(tenmin_log)
-                print("Alert, bradycardia detected! Here is 10 minute backlog: ")
-                print(tenmin_log_brady)
-                logging.warning("Alert, bradycardia detected! Here is 10 minute backlog: ")
-                logging.warning(tenmin_log_brady)
+        if(instantaneous_HR < brady):
+            tenmin_log_brady = alert_brady(tenmin_log)
+            print("Alert, bradycardia detected! Here is 10 minute backlog: ")
+            print(tenmin_log_brady)
+            logging.warning("Alert, bradycardia detected! Here is 10 minute backlog: ")
+            logging.warning(tenmin_log_brady)
 
 
-            if(instantaneous_HR > tachy):
-                tenmin_log_tachy = alert_tachy(tenmin_log)
-                print("Alert, tachycardia detected! Here is 10 minute backlog: ")
-                print(tenmin_log_tachy)
-                logging.warning("Alert, tachycardia detected! Here is 10 minute backlog: ")
-                logging.warning(tenmin_log_brady)
+        if(instantaneous_HR > tachy):
+            tenmin_log_tachy = alert_tachy(tenmin_log)
+            print("Alert, tachycardia detected! Here is 10 minute backlog: ")
+            print(tenmin_log_tachy)
+            logging.warning("Alert, tachycardia detected! Here is 10 minute backlog: ")
+            logging.warning(tenmin_log_brady)
 
-            if(len(onemin_avg_log) == 6):
-                onemin_avg = some_min_avg(onemin_avg_log)
-                print("1 minute average heart rate is %d." % onemin_avg)
-                logging.info("1 min. avg. HR: %d bpm" % onemin_avg)
-                onemin_avg_log.clear()
+        if(len(onemin_avg_log) == 6):
+            onemin_avg = some_min_avg(onemin_avg_log)
+            print("1 minute average heart rate is %d." % onemin_avg)
+            logging.info("1 min. avg. HR: %d bpm" % onemin_avg)
+            onemin_avg_log.clear()
 
-            if(len(fivemin_avg_log) == 30):
-                fivemin_avg = some_min_avg(fivemin_avg_log)
-                print("5 minute average heart rate is %d." % fivemin_avg)
-                logging.info("5 min. avg. HR: %d bpm" % fivemin_avg)
-                fivemin_avg_log.clear()
+        if(len(fivemin_avg_log) == 30):
+            fivemin_avg = some_min_avg(fivemin_avg_log)
+            print("5 minute average heart rate is %d." % fivemin_avg)
+            logging.info("5 min. avg. HR: %d bpm" % fivemin_avg)
+            fivemin_avg_log.clear()
 
             if(len(usermin_avg_log) == (usermin*6)):
-                usermin_avg = some_min_avg(usermin_avg_log)
-                print("%d minute average heart rate is %d." % (usermin, usermin_avg))
-                logging.info("%d min. avg. HR: %d bpm" % (usermin, usermin_avg))
-                usermin_avg_log.clear()
+            usermin_avg = some_min_avg(usermin_avg_log)
+             print("%d minute average heart rate is %d." % (usermin, usermin_avg))
+            logging.info("%d min. avg. HR: %d bpm" % (usermin, usermin_avg))
+            usermin_avg_log.clear()
 
-            iteration += 1
-    except EOFError:
-        print("End of file.")
-        logging.error("End of file.")
-    except KeyboardInterrupt:
-        print("You canceled the operation.")
-        logging.error("You canceled the operation.")
-    except:
-        print("An error has occured.")
-        logging.error("An error has occured.")
+        iteration += 1
+
 
