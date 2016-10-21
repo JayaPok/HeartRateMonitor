@@ -7,33 +7,95 @@ def read_data(filename, SampFreq, iteration):
     :param: binary file, sampling frequency, and iteration number of loop in main method
     :returns: ten second data of binary file based on iteration """ 
     import numpy as np
+    from scipy.io import loadmat
+    import h5py  
     
-    f = open(filename, "rb")
-    f.seek(2*(10*SampFreq*iteration))
-    tensec_data = []
-    i = 0
+    try:
+        f = open(filename, "rb")
+        f.seek(2*(10*iteration))
+        tensec_data = []
+        i = 0
 
-    while(i < (20*SampFreq)):
-        data = f.read(2)
-        tensec_data.append(int.from_bytes(data, byteorder = 'little'))
-        f.seek(0, 1)
-        i+=1
-    
-    return tensec_data
+        while(i < (20)):
+            data = f.read(2)
+            tensec_data.append(int.from_bytes(data, byteorder = 'little'))
+            f.seek(0, 1)
+            i+=1
+        
+        return tensec_data
+
+    except:
+        try:
+            f = loadmat(filename)
+            d = dict(f)
+
+            ECGvals = d.get('ecg')
+            PPvals = d.get('pp')
+            tensec_data = []
+
+            i = 10*SampFreq*(iteration-1)
+
+            while(i < 10*SampFreq*iteration):
+                tensec_data.append(PPvals[i])
+                tensec_data.append(ECGvals[i])
+                i+=1
+
+            return tensec_data
+
+        except:
+            try:
+                f = h5py.File(filename)
+                d = dict(f)
+
+                ECGvals = d.get('ecg')
+                PPvals = d.get('pp')
+                tensec_data = []
+
+                i = 10*SampFreq*(iteration-1)
+
+                while(i < 10*SampFreq*iteration):
+                    tensec_data.append(PPvals[i])
+                    tensec_data.append(ECGvals[i])
+                    i+=1
+
+                return tensec_data
+            except IOError:
+                return 0
 
 
 def find_sampfreq(filename):
     """ find sampling frequency from the first values of the binary file
 
     :param: binary file
-    :returns: ECG and Pulse sampling frequency  """ 
-    f = open(filename, "rb")
-    SampFreqPulse = f.read(2)
-    SampFreqECG = f.read(2)
-    
-    SampFreq = int.from_bytes(SampFreqPulse, byteorder = 'little')
+    :returns: ECG and Pulse sampling frequency  """
+    from scipy.io import loadmat
+    import h5py     
 
-    return SampFreq
+    try:
+        f = open(filename, "rb")
+        SampFreqPulse = f.read(2)
+        SampFreqECG = f.read(2)  
+        SampFreq = int.from_bytes(SampFreqPulse, byteorder = 'little')
+
+        return SampFreq
+
+    except:
+        try:
+            f = loadmat(filename)
+            d = dict(f)
+            SampFreq = d.get('fs')
+        
+            return SampFreq
+
+        except:
+            try:
+                f = h5py.File(filename)
+                d = dict(f)
+                SampFreq = d.get('fs')
+
+                return SampFreq
+            except IOError:
+                return 0
 
 
 def obtain_ECG(tensec_data):
@@ -66,9 +128,9 @@ def heart_rate_ECG_insta(ECGData):
 
     i=6
     while i < ECGData.size-6:
-        ECGbefore = np.average(np.array(ECGData[i-1, i-2, i-3, i-4, i-5]))
+        ECGbefore = np.average(np.array(ECGData[(i-5):(i-1)]))
 
-        ECGafter = np.average(np.array(ECGData[i+1, i+2, i+3, i+4, i+5]))
+        ECGafter = np.average(np.array(ECGData[(i+1):(i+5)]))
 
         if ECGData[i] > ECGbefore and ECGData[i] > ECGafter:
             instantaneous_HR_indicies_ECG.append(i)
@@ -87,12 +149,16 @@ def heart_rate_Pleth_insta(PlethData):
     """
 
     instantaneous_HR_indicies_Pleth = [] # Array which holds temporary values of heart rates as data is read
-    i=1
-    while i < PlethData.size-1:
-        if PlethData[i] > PlethData[i-1] and PlethData[i] > PlethData[i+1]:
+    i=6
+    while i < PlethData.size-6:
+        Plethbefore = np.average(np.array(PlethData[(i-5):(i-1)]))
+
+        Plethafter = np.average(np.array(PlethData[(i+1):(i+5)]))
+
+        if PlethData[i] > Plethbefore and PlethData[i] > Plethafter:
             instantaneous_HR_indicies_Pleth.append(i)
         i+=1
-
+    
     ten_sec_info_Pleth = len(instantaneous_HR_indicies_Pleth)
     
     return ten_sec_info_Pleth
