@@ -64,24 +64,9 @@ if __name__ == "__main__":
     fivemin_avg_log = collections.deque([], maxlen = 30)
     usermin_avg_log = collections.deque([], maxlen = (usermin*6))
     
-    try:
-        f = open(file, "rb")
-        f.seek(0, os.SEEK_END)
-        size = f.tell()
-    except:
-        try: 
-            f = loadmat(file)
-            d = dict(f)
-            ECGvals = d.get('ecg')
-            size = len(ECGvals[0])*2
-        except:
-            try:
-                f = h5py.File(filename)
-                d = dict(f)
-                ECGvals = d.get('ecg')
-                size = len(ECGvals[0])*2
-            except IOError:
-                print("Could not open file.")
+    f = open(file, "rb")
+    f.seek(0, os.SEEK_END)
+    size = f.tell()
 
 
     

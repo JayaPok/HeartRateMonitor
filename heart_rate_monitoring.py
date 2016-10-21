@@ -7,60 +7,21 @@ def read_data(filename, SampFreq, iteration):
     :param: binary file, sampling frequency, and iteration number of loop in main method
     :returns: ten second data of binary file based on iteration """ 
     import numpy as np
-    from scipy.io import loadmat
-    import h5py  
     
-    try:
-        f = open(filename, "rb")
-        f.seek(2*(10*iteration))
-        tensec_data = []
-        i = 0
+    f = open(filename, "rb")
+    f.seek(2*(10*iteration))
+    tensec_data = []
+    i = 0
 
-        while(i < (20)):
-            data = f.read(2)
-            tensec_data.append(int.from_bytes(data, byteorder = 'little'))
-            f.seek(0, 1)
-            i+=1
+    while(i < (20)):
+        data = f.read(2)
+        tensec_data.append(int.from_bytes(data, byteorder = 'little'))
+        f.seek(0, 1)
+        i+=1
         
-        return tensec_data
+    return tensec_data
 
-    except:
-        try:
-            f = loadmat(filename)
-            d = dict(f)
 
-            ECGvals = d.get('ecg')
-            PPvals = d.get('pp')
-            tensec_data = []
-
-            i = 10*SampFreq*(iteration-1)
-
-            while(i < 10*SampFreq*iteration):
-                tensec_data.append(PPvals[i])
-                tensec_data.append(ECGvals[i])
-                i+=1
-
-            return tensec_data
-
-        except:
-            try:
-                f = h5py.File(filename)
-                d = dict(f)
-
-                ECGvals = d.get('ecg')
-                PPvals = d.get('pp')
-                tensec_data = []
-
-                i = 10*SampFreq*(iteration-1)
-
-                while(i < 10*SampFreq*iteration):
-                    tensec_data.append(PPvals[i])
-                    tensec_data.append(ECGvals[i])
-                    i+=1
-
-                return tensec_data
-            except IOError:
-                return 0
 
 
 def find_sampfreq(filename):
@@ -68,34 +29,16 @@ def find_sampfreq(filename):
 
     :param: binary file
     :returns: ECG and Pulse sampling frequency  """
-    from scipy.io import loadmat
-    import h5py     
+   
 
-    try:
-        f = open(filename, "rb")
-        SampFreqPulse = f.read(2)
-        SampFreqECG = f.read(2)  
-        SampFreq = int.from_bytes(SampFreqPulse, byteorder = 'little')
 
-        return SampFreq
+    f = open(filename, "rb")
+    SampFreqPulse = f.read(2)
+    SampFreqECG = f.read(2)  
+    SampFreq = int.from_bytes(SampFreqPulse, byteorder = 'little')
 
-    except:
-        try:
-            f = loadmat(filename)
-            d = dict(f)
-            SampFreq = d.get('fs')
-        
-            return SampFreq
+    return SampFreq
 
-        except:
-            try:
-                f = h5py.File(filename)
-                d = dict(f)
-                SampFreq = d.get('fs')
-
-                return SampFreq
-            except IOError:
-                return 0
 
 
 def obtain_ECG(tensec_data):
