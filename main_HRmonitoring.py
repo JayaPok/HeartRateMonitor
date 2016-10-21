@@ -3,6 +3,8 @@ estimate_instantaneous_HR, alert_brady, alert_tachy, some_min_avg
 import collections
 import os
 import logging
+from scipy.io import loadmat
+import h5py 
 
 def parse_cli():
     """ argparse capabilites that enables user to input values to change output
@@ -82,7 +84,7 @@ if __name__ == "__main__":
     
     try:
         while continuerun:
-            if ((20*iteration) > size):
+            if ((20*iteration*SampFreq) > size):
                 continuerun = False
 
             tensec_data = read_data(file, SampFreq, iteration)

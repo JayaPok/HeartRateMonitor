@@ -3,7 +3,7 @@ This project, "Heart Rate Monitor", takes in binary files of multiplexed ECG and
 
 
 How to Use:
-1. Type main_HRmonitoring.py --file "name of binary file" to run code with binary file
+1. Type main_HRmonitoring.py --file "name of binary/matlab/HDF5 file" to run code with binary file
 
 2. Can additionaly type --brady (number) --tachy (number) --signal ('ECG', 'PLETH', or 'BOTH') 
 --usermin (number) for additional user inputs to change threshold of bradycardia, tachycardia, type of signal, 
@@ -23,6 +23,12 @@ numpy - utilize MATLAB commands and features in the python environment
 2. collections - implement argpars into methods and python environment
 
 3. os - allows for reading length of binary file
+
+4. logging - allows for logging information with timestamps to another file
+
+5. scipy.io - allows for reading matlab (.mat) files
+
+6. h5py - allows for reading HDF5 files
 
 
 Notes:
