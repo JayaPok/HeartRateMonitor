@@ -2,6 +2,7 @@ from heart_rate_monitoring import read_data, find_sampfreq, obtain_ECG, obtain_P
 estimate_instantaneous_HR, alert_brady, alert_tachy, some_min_avg
 import collections
 import os
+import logging
 
 def parse_cli():
     """ argparse capabilites that enables user to input values to change output
