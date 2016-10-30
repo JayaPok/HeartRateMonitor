@@ -39,8 +39,8 @@ def read_data(filename, SampFreq, iteration):
             i = 10*SampFreq*(iteration-1)
 
             while(i < 10*SampFreq*iteration):
-                tensec_data.append(PPvals[i], 1)
-                tensec_data.append(ECGvals[i], 1)
+                tensec_data.append(np.round(PPvals[i], 1))
+                tensec_data.append(np.round(ECGvals[i], 1))
                 i+=1
 
             return tensec_data
