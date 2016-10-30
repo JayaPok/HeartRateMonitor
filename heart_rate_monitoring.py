@@ -21,8 +21,8 @@ def read_data(filename, SampFreq, iteration):
         i = 10*SampFreq*(iteration-1)
 
         while(i < 10*SampFreq*iteration):
-            tensec_data.append(PPvals[0][i])
-            tensec_data.append(ECGvals[0][i])
+            tensec_data.append(round(PPvals[0][i], 1))
+            tensec_data.append(round(ECGvals[0][i], 1))
             i+=1
 
         return tensec_data
@@ -39,8 +39,8 @@ def read_data(filename, SampFreq, iteration):
             i = 10*SampFreq*(iteration-1)
 
             while(i < 10*SampFreq*iteration):
-                tensec_data.append(PPvals[0][i])
-                tensec_data.append(ECGvals[0][i])
+                tensec_data.append(PPvals[i], 1)
+                tensec_data.append(ECGvals[i], 1)
                 i+=1
 
             return tensec_data
@@ -48,7 +48,7 @@ def read_data(filename, SampFreq, iteration):
         except:
             try:
                 f = open(filename, "rb")
-                f.seek(2*(10*SampFreq*iteration))
+                f.seek(2*2*(10*SampFreq*iteration))
                 tensec_data = []
                 i = 0
 
@@ -74,22 +74,21 @@ def find_sampfreq(filename):
         f = loadmat(filename)
         d = dict(f)
         SampFreq = d.get('fs')
-        SampFreq = SampFreq[0]
+        SampFreq = SampFreq[0][0]
         return SampFreq
     except:
         try:
             f = h5py.File(filename)
             d = dict(f)
             SampFreq = d.get('fs')
-            SampFreq = SampFreq[0]
+            SampFreq = SampFreq[0][0]
 
             return SampFreq
         except:
             try:
                 f = open(filename, "rb")
-                SampFreqPulse = f.read(2)
-                SampFreqECG = f.read(2)  
-                SampFreq = int.from_bytes(SampFreqPulse, byteorder = 'little')
+                SampFreqBoth = f.read(2) 
+                SampFreq = int.from_bytes(SampFreqBoth, byteorder = 'little')
                 return SampFreq
             except IOError:
                 return 0
