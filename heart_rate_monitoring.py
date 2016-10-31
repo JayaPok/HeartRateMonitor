@@ -25,7 +25,7 @@ def file_size(file):
                 size = (bytesize / 2) - 1  
                 return size
             except IOError:
-                #print("Could not open file.")
+                print("Could not open file.")
                 return 0
 
 def read_data(filename, SampFreq, iteration):
@@ -209,16 +209,6 @@ def alert_log(instantaneous_HR, tenmin_log, brady, tachy):
         logging.warning("Alert, tachycardia detected! Here is 10 minute backlog: ")
         logging.warning(tenmin_log_tachy)
 
-# def some_min_avg(somemin_avg_log):
-#     """ some minute average heart rate calculation
-
-#     :param: some minute heart rate back log
-#     :returns: some minute heart rate
-#     """
-    
-#     somemin_avg = sum(somemin_avg_log) / len(somemin_avg_log)
-
-#     return somemin_avg
 
 def some_min_avg(onemin_avg_log, fivemin_avg_log, usermin_avg_log, usermin):
     """ some minute average heart rate output
@@ -231,19 +221,16 @@ def some_min_avg(onemin_avg_log, fivemin_avg_log, usermin_avg_log, usermin):
         onemin_avg = sum(onemin_avg_log) / len(onemin_avg_log)
         print("1 minute average heart rate is %d." % onemin_avg)
         logging.info("1 min. avg. HR: %d bpm" % onemin_avg)
-        #onemin_avg_log.clear()
 
     if(len(fivemin_avg_log) == 30):
         fivemin_avg = sum(fivemin_avg_log) / len(fivemin_avg_log)
         print("5 minute average heart rate is %d." % fivemin_avg)
         logging.info("5 min. avg. HR: %d bpm" % fivemin_avg)
-        #fivemin_avg_log.clear()
 
     if(len(usermin_avg_log) == (usermin*6)):
         usermin_avg = sum(usermin_avg_log) / len(usermin_avg_log)
         print("%d minute average heart rate is %d." % (usermin, usermin_avg))
         logging.info("%d min. avg. HR: %d bpm" % (usermin, usermin_avg))
-        #usermin_avg_log.clear()
 
 
 
