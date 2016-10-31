@@ -1,5 +1,32 @@
 import numpy as np
 import collections
+import logging
+
+def file_size(file):
+    import os
+    try:
+        f = loadmat(file)
+        d = dict(f)
+        ECGvals = d.get('ecg')
+        size = len(ECGvals[0])*2
+        return size
+    except:
+        try: 
+            f = h5py.File(file)
+            d = dict(f)
+            ECGvals = d.get('ecg')
+            size = len(ECGvals)*2
+            return size
+        except:
+            try:
+                f = open(file, "rb")
+                f.seek(0, os.SEEK_END)
+                bytesize = f.tell()
+                size = (bytesize / 2) - 1  
+                return size
+            except IOError:
+                print("Could not open file.")
+                return 0
 
 def read_data(filename, SampFreq, iteration):
     """ read in raw data from binary file inputted by user
@@ -112,53 +139,28 @@ def obtain_Pleth(tensec_data):
 
     return PlethData
 
-
-def heart_rate_ECG_insta(ECGData):
-    """ estimate number of peaks in 10 second ECG data
+def heart_rate_insta(ECGorPlethData):
+    """ estimate number of peaks in 10 second ECG or Pleth data
     
-    :param: 10 second ECG data
-    :returns: 10 second ECG heart rate
+    :param: 10 second ECG or Pleth data
+    :returns: 10 second ECG or Pleth heart rate
     """
-
-    instantaneous_HR_indicies_ECG = [] # Array which holds temporary values of heart rates as data is read
+    instantaneous_HR_indicies = [] # Array which holds temporary values of heart rates as data is read
 
     i=6
-    while i < ECGData.size-6:
-        ECGbefore = np.average(np.array(ECGData[(i-5):(i-1)]))
+    while i < ECGorPlethData.size-6:
+        Databefore = np.average(np.array(ECGorPlethData[(i-5):(i-1)]))
 
-        ECGafter = np.average(np.array(ECGData[(i+1):(i+5)]))
+        Dataafter = np.average(np.array(ECGorPlethData[(i+1):(i+5)]))
 
-        if ECGData[i] > ECGbefore and ECGData[i] > ECGafter:
-            instantaneous_HR_indicies_ECG.append(i)
+        if ECGorPlethData[i] > Databefore and ECGorPlethData[i] > Dataafter:
+            instantaneous_HR_indicies.append(i)
         i+=1
     
-    ten_sec_info_ECG = len(instantaneous_HR_indicies_ECG)
+    ten_sec_info = len(instantaneous_HR_indicies)
    
-    return ten_sec_info_ECG
+    return ten_sec_info
 
-
-def heart_rate_Pleth_insta(PlethData):
-    """ estimate number of peaks in 10 second Pleth data
-    
-    :param: 10 second Pleth data
-    :returns: 10 second Pleth heart rate
-    """
-
-    instantaneous_HR_indicies_Pleth = [] # Array which holds temporary values of heart rates as data is read
-
-    i=6
-    while i < PlethData.size-6:
-        Plethbefore = np.average(np.array(PlethData[(i-5):(i-1)]))
-
-        Plethafter = np.average(np.array(PlethData[(i+1):(i+5)]))
-
-        if PlethData[i] > Plethbefore and PlethData[i] > Plethafter:
-            instantaneous_HR_indicies_Pleth.append(i)
-        i+=1
-    
-    ten_sec_info_Pleth = len(instantaneous_HR_indicies_Pleth)
-    
-    return ten_sec_info_Pleth
 
 def estimate_instantaneous_HR(ten_sec_info_avg):
     """ estimate 10 second instantaneous heart rate
@@ -170,40 +172,65 @@ def estimate_instantaneous_HR(ten_sec_info_avg):
 
     instantaneous_HR = ten_sec_info_avg * 6
 
+    print("10 second instantaneous heart rate is %d bmp." % instantaneous_HR)
+    logging.info("10 sec inst. HR: %d bpm" % instantaneous_HR)
+
     return instantaneous_HR
 
-def alert_brady(tenmin_log):
+def alert_brady_tachy(tenmin_log):
     """ bradycardia alert
 
     :param: ten minute heart rate back log
     :returns: ten minute heart rate back log
     """
     
-    tenmin_log_brady = list(tenmin_log)
+    tenmin_log_vals = list(tenmin_log)
 
-    return tenmin_log_brady
+    return tenmin_log_vals
 
-def alert_tachy(tenmin_log):
-    """ tachycardia alert
+def alert_log(instantaneous_HR, tenmin_log, brady, tachy):
+    """ ten minute log output in the case of bradycardia or tachycardia
 
-    :param: ten minute heart rate back log
-    :returns: ten minute heart rate back log
+    :param: 10 second heart rate, ten minute log, bradycardia threshold, tachycardia threshold
+    :returns:
     """
-    
-    tenmin_log_tachy = list(tenmin_log)
+    if(instantaneous_HR < brady):
+        tenmin_log_brady = alert_brady_tachy(tenmin_log)
+        print("Alert, bradycardia detected! Here is 10 minute backlog: ")
+        print(tenmin_log_brady)
+        logging.warning("Alert, bradycardia detected! Here is 10 minute backlog: ")
+        logging.warning(tenmin_log_brady)
 
-    return tenmin_log_tachy
 
-def some_min_avg(somemin_avg_log):
-    """ some minute average heart rate calculation
+    if(instantaneous_HR > tachy):
+        tenmin_log_tachy = alert_brady_tachy(tenmin_log)
+        print("Alert, tachycardia detected! Here is 10 minute backlog: ")
+        print(tenmin_log_tachy)
+        logging.warning("Alert, tachycardia detected! Here is 10 minute backlog: ")
+        logging.warning(tenmin_log_tachy)
 
-    :param: some minute heart rate back log
-    :returns: some minute heart rate
+
+def some_min_avg(onemin_avg_log, fivemin_avg_log, usermin_avg_log, usermin):
+    """ some minute average heart rate output
+
+    :param: one minute HR log, five minute HR log, user inputted minute HR log
+    :returns: 
     """
-    
-    somemin_avg = sum(somemin_avg_log) / len(somemin_avg_log)
 
-    return somemin_avg
+    if(len(onemin_avg_log) == 6):
+        onemin_avg = sum(onemin_avg_log) / len(onemin_avg_log)
+        print("1 minute average heart rate is %d." % onemin_avg)
+        logging.info("1 min. avg. HR: %d bpm" % onemin_avg)
+
+    if(len(fivemin_avg_log) == 30):
+        fivemin_avg = sum(fivemin_avg_log) / len(fivemin_avg_log)
+        print("5 minute average heart rate is %d." % fivemin_avg)
+        logging.info("5 min. avg. HR: %d bpm" % fivemin_avg)
+
+    if(len(usermin_avg_log) == (usermin*6)):
+        usermin_avg = sum(usermin_avg_log) / len(usermin_avg_log)
+        print("%d minute average heart rate is %d." % (usermin, usermin_avg))
+        logging.info("%d min. avg. HR: %d bpm" % (usermin, usermin_avg))
 
 
 
