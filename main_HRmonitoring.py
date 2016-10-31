@@ -5,6 +5,7 @@ import os
 import logging
 from scipy.io import loadmat
 import h5py 
+import sys
 
 def parse_cli():
     """ argparse capabilites that enables user to input values to change output
@@ -51,7 +52,7 @@ if __name__ == "__main__":
     
     file, brady, tachy, signal, usermin = main()
 
-    logging.basicConfig(level=logging.INFO, filename="log.txt", format='%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p')
+    logging.basicConfig(level=logging.INFO, filename="log.txt", filemode = 'w', format='%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p')
 
     SampFreq = find_sampfreq(file)
 
@@ -70,7 +71,7 @@ if __name__ == "__main__":
             f = h5py.File(filename)
             d = dict(f)
             ECGvals = d.get('ecg')
-            size = len(ECGvals[0])*2
+            size = len(ECGvals)*2
         except:
             try:
                 f = open(file, "rb")
@@ -81,11 +82,14 @@ if __name__ == "__main__":
 
     iteration = 1
     continuerun = True
+    contrun = 1
+    total_iter = size / (SampFreq*20)
     
     try:
-        while continuerun:
-            if ((20*iteration*SampFreq) > size):
-                continuerun = False
+        while contrun == 1:
+            if (20*iteration*SampFreq > size+1):
+                logging.debug("File is finished!")
+                sys.exit()
 
             tensec_data = read_data(file, SampFreq, iteration)
             ECGData = obtain_ECG(tensec_data)
@@ -123,7 +127,7 @@ if __name__ == "__main__":
                 print("Alert, tachycardia detected! Here is 10 minute backlog: ")
                 print(tenmin_log_tachy)
                 logging.warning("Alert, tachycardia detected! Here is 10 minute backlog: ")
-                logging.warning(tenmin_log_brady)
+                logging.warning(tenmin_log_tachy)
 
             if(len(onemin_avg_log) == 6):
                 onemin_avg = some_min_avg(onemin_avg_log)
@@ -142,7 +146,6 @@ if __name__ == "__main__":
                 print("%d minute average heart rate is %d." % (usermin, usermin_avg))
                 logging.info("%d min. avg. HR: %d bpm" % (usermin, usermin_avg))
                 usermin_avg_log.clear()
-
             iteration += 1
     except EOFError:
         print("End of file.")
