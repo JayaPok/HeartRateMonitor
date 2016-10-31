@@ -1,5 +1,5 @@
-from heart_rate_monitoring import read_data, find_sampfreq, obtain_ECG, obtain_Pleth, heart_rate_ECG_insta, heart_rate_Pleth_insta, \
-estimate_instantaneous_HR, alert_brady, alert_tachy, some_min_avg
+from heart_rate_monitoring import read_data, find_sampfreq, obtain_ECG, obtain_Pleth, \
+estimate_instantaneous_HR, some_min_avg, file_size, heart_rate_insta, alert_brady_tachy, alert_log
 import collections
 import os
 import logging
@@ -61,29 +61,30 @@ if __name__ == "__main__":
     fivemin_avg_log = collections.deque([], maxlen = 30)
     usermin_avg_log = collections.deque([], maxlen = (usermin*6))
 
-    try:
-        f = loadmat(file)
-        d = dict(f)
-        ECGvals = d.get('ecg')
-        size = len(ECGvals[0])*2
-    except:
-        try: 
-            f = h5py.File(filename)
-            d = dict(f)
-            ECGvals = d.get('ecg')
-            size = len(ECGvals)*2
-        except:
-            try:
-                f = open(file, "rb")
-                f.seek(0, os.SEEK_END)
-                size = f.tell()
-            except IOError:
-                print("Could not open file.")
+    # try:
+    #     f = loadmat(file)
+    #     d = dict(f)
+    #     ECGvals = d.get('ecg')
+    #     size = len(ECGvals[0])*2
+    # except:
+    #     try: 
+    #         f = h5py.File(file)
+    #         d = dict(f)
+    #         ECGvals = d.get('ecg')
+    #         size = len(ECGvals)*2
+    #     except:
+    #         try:
+    #             f = open(file, "rb")
+    #             f.seek(0, os.SEEK_END)
+    #             bytesize = f.tell()
+    #             size = (bytesize / 2) - 1 
+    #         except IOError:
+    #             print("Could not open file.")
+
+    size = file_size(file)
 
     iteration = 1
-    continuerun = True
     contrun = 1
-    total_iter = size / (SampFreq*20)
     
     try:
         while contrun == 1:
@@ -95,8 +96,8 @@ if __name__ == "__main__":
             ECGData = obtain_ECG(tensec_data)
             PlethData = obtain_Pleth(tensec_data)
         
-            ten_sec_info_ECG = heart_rate_ECG_insta(ECGData)
-            ten_sec_info_Pleth = heart_rate_Pleth_insta(PlethData)
+            ten_sec_info_ECG = heart_rate_insta(ECGData)
+            ten_sec_info_Pleth = heart_rate_insta(PlethData)
 
             if(signal == "ECG"):
                 tensec_info_avg = ten_sec_info_ECG
@@ -107,45 +108,58 @@ if __name__ == "__main__":
 
             instantaneous_HR = estimate_instantaneous_HR(tensec_info_avg)
             tenmin_log.append(instantaneous_HR)
+            alert_log(instantaneous_HR, tenmin_log, brady, tachy)
             onemin_avg_log.append(instantaneous_HR)
             fivemin_avg_log.append(instantaneous_HR)
             usermin_avg_log.append(instantaneous_HR)
-        
-            print("10 second instantaneous heart rate is %d bmp." % instantaneous_HR)
-            logging.info("10 sec inst. HR: %d bpm" % instantaneous_HR)
-        
-            if(instantaneous_HR < brady):
-                tenmin_log_brady = alert_brady(tenmin_log)
-                print("Alert, bradycardia detected! Here is 10 minute backlog: ")
-                print(tenmin_log_brady)
-                logging.warning("Alert, bradycardia detected! Here is 10 minute backlog: ")
-                logging.warning(tenmin_log_brady)
 
-
-            if(instantaneous_HR > tachy):
-                tenmin_log_tachy = alert_tachy(tenmin_log)
-                print("Alert, tachycardia detected! Here is 10 minute backlog: ")
-                print(tenmin_log_tachy)
-                logging.warning("Alert, tachycardia detected! Here is 10 minute backlog: ")
-                logging.warning(tenmin_log_tachy)
+            some_min_avg(onemin_avg_log, fivemin_avg_log, usermin_avg_log, usermin)
 
             if(len(onemin_avg_log) == 6):
-                onemin_avg = some_min_avg(onemin_avg_log)
-                print("1 minute average heart rate is %d." % onemin_avg)
-                logging.info("1 min. avg. HR: %d bpm" % onemin_avg)
                 onemin_avg_log.clear()
 
             if(len(fivemin_avg_log) == 30):
-                fivemin_avg = some_min_avg(fivemin_avg_log)
-                print("5 minute average heart rate is %d." % fivemin_avg)
-                logging.info("5 min. avg. HR: %d bpm" % fivemin_avg)
                 fivemin_avg_log.clear()
 
             if(len(usermin_avg_log) == (usermin*6)):
-                usermin_avg = some_min_avg(usermin_avg_log)
-                print("%d minute average heart rate is %d." % (usermin, usermin_avg))
-                logging.info("%d min. avg. HR: %d bpm" % (usermin, usermin_avg))
                 usermin_avg_log.clear()
+        
+            # print("10 second instantaneous heart rate is %d bmp." % instantaneous_HR)
+            # logging.info("10 sec inst. HR: %d bpm" % instantaneous_HR)
+            
+
+            # if(instantaneous_HR < brady):
+            #     tenmin_log_brady = alert_brady_tachy(tenmin_log)
+            #     print("Alert, bradycardia detected! Here is 10 minute backlog: ")
+            #     print(tenmin_log_brady)
+            #     logging.warning("Alert, bradycardia detected! Here is 10 minute backlog: ")
+            #     logging.warning(tenmin_log_brady)
+
+
+            # if(instantaneous_HR > tachy):
+            #     tenmin_log_tachy = alert_brady_tachy(tenmin_log)
+            #     print("Alert, tachycardia detected! Here is 10 minute backlog: ")
+            #     print(tenmin_log_tachy)
+            #     logging.warning("Alert, tachycardia detected! Here is 10 minute backlog: ")
+            #     logging.warning(tenmin_log_tachy)
+
+            # if(len(onemin_avg_log) == 6):
+            #     onemin_avg = some_min_avg(onemin_avg_log)
+            #     print("1 minute average heart rate is %d." % onemin_avg)
+            #     logging.info("1 min. avg. HR: %d bpm" % onemin_avg)
+            #     onemin_avg_log.clear()
+
+            # if(len(fivemin_avg_log) == 30):
+            #     fivemin_avg = some_min_avg(fivemin_avg_log)
+            #     print("5 minute average heart rate is %d." % fivemin_avg)
+            #     logging.info("5 min. avg. HR: %d bpm" % fivemin_avg)
+            #     fivemin_avg_log.clear()
+
+            # if(len(usermin_avg_log) == (usermin*6)):
+            #     usermin_avg = some_min_avg(usermin_avg_log)
+            #     print("%d minute average heart rate is %d." % (usermin, usermin_avg))
+            #     logging.info("%d min. avg. HR: %d bpm" % (usermin, usermin_avg))
+            #     usermin_avg_log.clear()
             iteration += 1
     except EOFError:
         print("End of file.")
