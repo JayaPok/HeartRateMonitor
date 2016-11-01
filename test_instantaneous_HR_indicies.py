@@ -11,4 +11,4 @@ def test_instantaneous_HR_indicies():
 
     heart_rate_length = heart_rate_insta(y)
 
-    assert heart_rate_length == 300
+    assert heart_rate_length == 100

@@ -11,9 +11,9 @@ def test_filetypes():
     matlab_sampfreq = find_sampfreq('test_filetypes.mat')
     h5py_sampfreq = find_sampfreq('test_filetypes_h5py.mat')
 
-    matlab_data_tensec = read_data('test_filetypes.mat', matlab_sampfreq, 1)
-    h5py_data_tensec = read_data('test_filetypes_h5py.mat', h5py_sampfreq, 1)
-    binary_data_tensec = read_data('test1.bin', 10, 1)
+    matlab_data_tensec = read_data('test_filetypes.mat', matlab_sampfreq, 1, "BOTH")
+    h5py_data_tensec = read_data('test_filetypes_h5py.mat', h5py_sampfreq, 1, "BOTH")
+    binary_data_tensec = read_data('test1.bin', 10, 1, "BOTH")
 
     assert binary_sampfreq == 20000
     assert matlab_sampfreq == 1

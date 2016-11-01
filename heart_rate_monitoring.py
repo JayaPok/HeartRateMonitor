@@ -165,7 +165,7 @@ def read_data(filename, sampfreq, iteration, signal):
                 tensec_data = np.array([])
                 i = 0
 
-                while i < (20*SampFreq):
+                while i < (20*sampfreq):
                     data = f.read(2)
                     tensec_data = np.append(tensec_data, np.round(
                         int.from_bytes(data, byteorder='little'), 1))

@@ -18,4 +18,4 @@ def test_estimate_instantaneous_HR():
     heart_rate_length = heart_rate_insta(y)
     instantaneous_HR = estimate_instantaneous_HR("ECG", heart_rate_length, heart_rate_length)
 
-    assert instantaneous_HR == 1800
+    assert instantaneous_HR == 600
