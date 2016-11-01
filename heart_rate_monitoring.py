@@ -9,7 +9,9 @@ def parse_cli():
     :param: user inputed values for one or more of filename, bradycardia
      threshold, tachycardia threshold, signal type,
      and desired minute HR average
-    :returns: returns args arguments for main method() """
+    :return args: user inputted arguments
+    """
+
     import argparse as ap
 
     par = ap.ArgumentParser(description="run program for inputted binary file",
@@ -39,8 +41,13 @@ def main_arg():
     """ run all functions of heart_rate_monitoring file
 
     :param: arg arguments from argparse
-    :returns: user inputed variables to be inputed into code for specific
-     responses """
+    :return file: return user inputted file
+    :return brady: return user inputted bradycardia value
+    :return tachy: return user inputted tachycardia value
+    :return signal: return user inputted signal
+    :return usermin: return user inputted number of minutes HR
+    """
+
     args = parse_cli()
 
     file = args.file
@@ -55,8 +62,10 @@ def main_arg():
 def file_size(file):
     """ determine size of matlab, hd5f, or binary file
 
-    :param: file
-    :returns: size of file """
+    :param file: user inputted file
+    :return size: size of file
+    """
+
     import os
     from scipy.io import loadmat
     import h5py 
@@ -86,11 +95,14 @@ def file_size(file):
 
 
 def read_data(filename, sampfreq, iteration):
-    """ read in raw data from binary file inputted by user
+    """ read in raw data from matlab, hdf5, or binary file inputted by user
 
-    :param: binary file, sampling frequency, and iteration number of loop
-    in main method
-    :returns: ten second data of binary file based on iteration """
+    :param filename: user inputted file
+    :param sampfreq: sample frequency of file
+    :param iteration: position in file data that is being read
+    :return tensec_data: ten seconds worth of heart rate data
+    """
+
     from scipy.io import loadmat
     import h5py
 
@@ -148,10 +160,12 @@ def read_data(filename, sampfreq, iteration):
 
 
 def find_sampfreq(filename):
-    """ find sampling frequency from the first values of the binary file
+    """ find sampling frequency from matlab, hdf5, or binary file
 
-    :param: binary file
-    :returns: ECG and Pulse sampling frequency  """
+    :param filename: user inputted file
+    :return sampfreq: sample frequency found from file
+    """
+
     from scipy.io import loadmat
     import h5py
 
@@ -182,8 +196,10 @@ def find_sampfreq(filename):
 def obtain_ECG(tensec_data):
     """ obtain ECG values of ten second data
 
-    :param: multiplexed ECG and Pleth data
-    :returns: ECG data  """
+    :param tensec_data: 10 seconds worth of heart rate data points
+    :return ECGData: ECG unmultiplexed data
+    """
+
     ECGData = tensec_data[1::2]
 
     return ECGData
@@ -192,8 +208,10 @@ def obtain_ECG(tensec_data):
 def obtain_Pleth(tensec_data):
     """ obtain Pulse Pleth values of ten second data
 
-    :param: multiplexed ECG and Pleth data
-    :returns: Pleth data  """
+    :param tensec_data: 10 seconds worth of heart rate data points
+    :return PlethData: Pulse Pleth unmultiplexed data
+    """
+
     PlethData = tensec_data[0::2]
 
     return PlethData
@@ -202,9 +220,10 @@ def obtain_Pleth(tensec_data):
 def heart_rate_insta(ECGorPlethData):
     """ estimate number of peaks in 10 second ECG or Pleth data
 
-    :param: 10 second ECG or Pleth data
-    :returns: 10 second ECG or Pleth heart rate
+    :param ECGorPlethData: 10 seconds worth of heart rate data points
+    :return ten_sec_info: number of peaks in 10 seconds of data
     """
+
     instantaneous_HR_indicies = np.array([])  # Array which holds
     # temporary values of heart rates as data is read
 
@@ -226,9 +245,12 @@ def heart_rate_insta(ECGorPlethData):
 def estimate_instantaneous_HR(signal, ten_sec_info_ECG, ten_sec_info_Pleth):
     """ estimate 10 second instantaneous heart rate
 
-    :param: 10 second average of ECG and Pulse HR data and signal of interest
-    :returns: instantaneous averaged heart rate
+    :param signal: signal of "ECG", "PLETH", or "BOTH
+    :param ten_sec_info_ECG: ten second heart rate ECG data
+    :param ten_sec_info_Pleth: ten second heart rate Pulse Pleth data
+    :return instantaneous_HR: instantaneous heart rate of 10 second data
     """
+
     if signal == "ECG":
         tensec_info_avg = ten_sec_info_ECG
     elif signal == "PLETH":
@@ -246,10 +268,10 @@ def estimate_instantaneous_HR(signal, ten_sec_info_ECG, ten_sec_info_Pleth):
 
 
 def alert_brady_tachy(tenmin_log):
-    """ bradycardia alert
+    """ bradycardia/tachycardia alert
 
-    :param: ten minute heart rate back log
-    :returns: ten minute heart rate back log
+    :param tenmin_log: log containing up to last 60 values of past 10 seconds of HR data
+    :return tenmin_log_vals: ten minute log in the form of a list
     """
 
     tenmin_log_vals = list(tenmin_log)
@@ -260,10 +282,13 @@ def alert_brady_tachy(tenmin_log):
 def alert_log(instantaneous_HR, tenmin_log, brady, tachy):
     """ ten minute log output in the case of bradycardia or tachycardia
 
-    :param: 10 second heart rate, ten minute log, bradycardia threshold,
-     tachycardia threshold
-    :returns:
+    :param instantaneous_HR: heart rate obtained from previous 10 seconds of HR data
+    :param tenmin_log: log containing up to last 60 values of past 10 seconds of HR data
+    :param brady: heart rate value representing bradycardia
+    :param tachy: heart rate value representing tachycardia
+    :return: prints log in case of alarm
     """
+
     if instantaneous_HR < brady:
         tenmin_log_brady = alert_brady_tachy(tenmin_log)
         print("Alert, bradycardia detected! Here is 10 minute backlog: ",
@@ -284,10 +309,18 @@ def alert_log(instantaneous_HR, tenmin_log, brady, tachy):
 
 
 def some_min_avg(onemin_avg_log, fivemin_avg_log, usermin_avg_log, usermin):
-    """ some minute average heart rate output
+    """some minute average heart rate output
 
-    :param: one minute HR log, five minute HR log, user inputted minute HR log
-    :returns:
+    :param onemin_avg_log: log of 6 values of 10 second instantaneous
+     heart rate over the past minute
+    :param fivemin_avg_log: log of 30 values of 10 second
+    instantaneous heart rate over the past 5 minutes
+    :param usermin_avg_log: log of usermin*6 values of 10 second
+    instantaneous heart rate over the past user inputted minutes
+    :param usermin: user inputted minute to be averaged
+    :return onemin_avg: one minute average of heart rate
+    :return fivemin_avg: five minute average of heart rate
+    :return usermin_avg: user inputted minute average of heart rate
     """
 
     if len(onemin_avg_log) == 6:
