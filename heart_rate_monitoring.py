@@ -94,12 +94,13 @@ def file_size(file):
                 return 0
 
 
-def read_data(filename, sampfreq, iteration):
+def read_data(filename, sampfreq, iteration, signal):
     """ read in raw data from matlab, hdf5, or binary file inputted by user
 
     :param filename: user inputted file
     :param sampfreq: sample frequency of file
     :param iteration: position in file data that is being read
+    :param signal: signal type specified by user
     :return tensec_data: ten seconds worth of heart rate data
     """
 
@@ -110,8 +111,16 @@ def read_data(filename, sampfreq, iteration):
         f = loadmat(filename)
         d = dict(f)
 
-        ecgvals = d.get('ecg').T.astype(np.float)
-        ppvals = d.get('pp').T.astype(np.float)
+        if signal == "ECG":
+            ecgvals = d.get('ecg').T.astype(np.float)
+            ppvals = d.get('ecg').T.astype(np.float)
+        elif signal == "PLETH":
+            ecgvals = d.get('pp').T.astype(np.float)
+            ppvals = d.get('pp').T.astype(np.float)            
+        else:
+            ecgvals = d.get('ecg').T.astype(np.float)
+            ppvals = d.get('pp').T.astype(np.float)
+
         tensec_data = np.array([])
 
         i = int(10 * sampfreq * (iteration - 1))
@@ -128,9 +137,17 @@ def read_data(filename, sampfreq, iteration):
             f = h5py.File(filename)
             d = dict(f)
 
-            ecgvals = d.get('ecg')[0].T.astype(np.float)
-            ppvals = d.get('pp')[0].T.astype(np.float)
-            tensec_data = np.array([])
+            if signal == "ECG":
+                ecgvals = d.get('ecg')[0].T.astype(np.float)
+                ppvals = d.get('ecg')[0].T.astype(np.float)
+            elif signal == "PLETH":
+                ecgvals = d.get('pp')[0].T.astype(np.float)
+                ppvals = d.get('pp')[0].T.astype(np.float)            
+            else:
+                ecgvals = d.get('ecg')[0].T.astype(np.float)
+                ppvals = d.get('pp')[0].T.astype(np.float)
+                
+                tensec_data = np.array([])
 
             i = int(10*sampfreq*(iteration-1))
 
@@ -237,7 +254,7 @@ def heart_rate_insta(ECGorPlethData):
             instantaneous_HR_indicies = np.append(instantaneous_HR_indicies, i)
         i += 1
 
-    ten_sec_info = len(instantaneous_HR_indicies)
+    ten_sec_info = len(instantaneous_HR_indicies) / 3
 
     return ten_sec_info
 

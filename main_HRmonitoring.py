@@ -41,7 +41,7 @@ if __name__ == "__main__":
                 logging.debug("File is finished!")
                 sys.exit()
 
-            tensec_data = read_data(file, sampfreq, iteration)
+            tensec_data = read_data(file, sampfreq, iteration, signal)
             ECGData = obtain_ECG(tensec_data)
             PlethData = obtain_Pleth(tensec_data)
 
