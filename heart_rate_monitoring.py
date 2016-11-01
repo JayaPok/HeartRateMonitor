@@ -2,8 +2,45 @@ import numpy as np
 import collections
 import logging
 
+def parse_cli():
+    """ argparse capabilites that enables user to input values to change output
+    
+    :param: user inputed values for one or more of filename, bradycardia threshold, tachycardia threshold, signal type, and desired minute HR average
+    :returns: returns args arguments for main method() """ 
+    import argparse as ap
+
+    par = ap.ArgumentParser(description = "run program for inputted binary file", formatter_class = ap.ArgumentDefaultsHelpFormatter)
+
+    par.add_argument("--file", dest = "file", help="input binary file", type = str)
+    par.add_argument("--brady", dest = "brady", help="input bradycardia starting heart rate", type = int, default = 30)
+    par.add_argument("--tachy", dest = "tachy", help="input tachycardia starting heart rate", type = int, default = 240)
+    par.add_argument("--signal", dest = "signal", help="input ECG for ECG signal HR estimation, PLETH for Plethysmograph HR estimation, \
+     or BOTH for an average of both signals HR estimation", type = str, default = "BOTH")
+    par.add_argument("--usermin", dest = "usermin", help="input desired multi-minute heart rate average", type = int, default = 2)
+
+    args = par.parse_args()
+
+    return args
+
+def main_arg():
+    """ run all functions of heart_rate_monitoring file
+    
+    :param: arg arguments from argparse
+    :returns: user inputed variables to be inputed into code for specific responses """ 
+    args = parse_cli()
+
+    file = args.file
+    brady = args.brady
+    tachy = args.tachy
+    signal = args.signal
+    usermin = args.usermin
+
+    return file, brady, tachy, signal, usermin
+
 def file_size(file):
     import os
+    from scipy.io import loadmat 
+    import h5py 
     try:
         f = loadmat(file)
         d = dict(f)
@@ -32,8 +69,7 @@ def read_data(filename, SampFreq, iteration):
     """ read in raw data from binary file inputted by user
 
     :param: binary file, sampling frequency, and iteration number of loop in main method
-    :returns: ten second data of binary file based on iteration """ 
-    import numpy as np
+    :returns: ten second data of binary file based on iteration """     
     from scipy.io import loadmat
     import h5py  
     
@@ -43,13 +79,13 @@ def read_data(filename, SampFreq, iteration):
 
         ECGvals = d.get('ecg')
         PPvals = d.get('pp')
-        tensec_data = []
+        tensec_data = np.array([])
 
         i = 10*SampFreq*(iteration-1)
 
         while(i < 10*SampFreq*iteration):
-            tensec_data.append(round(PPvals[0][i], 1))
-            tensec_data.append(round(ECGvals[0][i], 1))
+            tensec_data = np.append(tensec_data, np.round(PPvals[0][i], 1))
+            tensec_data = np.append(tensec_data, np.round(ECGvals[0][i], 1))
             i+=1
 
         return tensec_data
@@ -61,13 +97,13 @@ def read_data(filename, SampFreq, iteration):
 
             ECGvals = d.get('ecg')
             PPvals = d.get('pp')
-            tensec_data = []
+            tensec_data = np.array([])
 
             i = 10*SampFreq*(iteration-1)
 
             while(i < 10*SampFreq*iteration):
-                tensec_data.append(np.round(PPvals[i], 1))
-                tensec_data.append(np.round(ECGvals[i], 1))
+                tensec_data = np.append(tensec_data, np.round(PPvals[i], 1))
+                tensec_data = np.append(tensec_data, np.round(ECGvals[i], 1))
                 i+=1
 
             return tensec_data
@@ -76,12 +112,12 @@ def read_data(filename, SampFreq, iteration):
             try:
                 f = open(filename, "rb")
                 f.seek(2*2*(10*SampFreq*iteration))
-                tensec_data = []
+                tensec_data = np.array([])
                 i = 0
 
                 while(i < (20*SampFreq)):
                     data = f.read(2)
-                    tensec_data.append(int.from_bytes(data, byteorder = 'little'))
+                    tensec_data = np.append(tensec_data, np.round(int.from_bytes(data, byteorder = 'little'), 1))
                     f.seek(0, 1)
                     i+=1       
                 return tensec_data
@@ -126,7 +162,7 @@ def obtain_ECG(tensec_data):
 
     :param: multiplexed ECG and Pleth data
     :returns: ECG data  """
-    ECGData= np.array(tensec_data[1::2])
+    ECGData= tensec_data[1::2]
 
     return ECGData
 
@@ -135,7 +171,7 @@ def obtain_Pleth(tensec_data):
 
     :param: multiplexed ECG and Pleth data
     :returns: Pleth data  """
-    PlethData = np.array(tensec_data[0::2])
+    PlethData = tensec_data[0::2]
 
     return PlethData
 
@@ -145,16 +181,16 @@ def heart_rate_insta(ECGorPlethData):
     :param: 10 second ECG or Pleth data
     :returns: 10 second ECG or Pleth heart rate
     """
-    instantaneous_HR_indicies = [] # Array which holds temporary values of heart rates as data is read
+    instantaneous_HR_indicies = np.array([]) # Array which holds temporary values of heart rates as data is read
 
     i=6
     while i < ECGorPlethData.size-6:
-        Databefore = np.average(np.array(ECGorPlethData[(i-5):(i-1)]))
+        Databefore = np.average(ECGorPlethData[(i-5):(i-1)])
 
-        Dataafter = np.average(np.array(ECGorPlethData[(i+1):(i+5)]))
+        Dataafter = np.average(ECGorPlethData[(i+1):(i+5)])
 
         if ECGorPlethData[i] > Databefore and ECGorPlethData[i] > Dataafter:
-            instantaneous_HR_indicies.append(i)
+            instantaneous_HR_indicies = np.append(instantaneous_HR_indicies, i)
         i+=1
     
     ten_sec_info = len(instantaneous_HR_indicies)
@@ -162,17 +198,23 @@ def heart_rate_insta(ECGorPlethData):
     return ten_sec_info
 
 
-def estimate_instantaneous_HR(ten_sec_info_avg):
+def estimate_instantaneous_HR(signal, ten_sec_info_ECG, ten_sec_info_Pleth):
     """ estimate 10 second instantaneous heart rate
 
-    :param: 10 second average of ECG and Pulse HR data
+    :param: 10 second average of ECG and Pulse HR data and signal of interest
     :returns: instantaneous averaged heart rate
     """
-    import numpy as np
+    if(signal == "ECG"):
+        tensec_info_avg = ten_sec_info_ECG
+    elif(signal == "PLETH"):
+        tensec_info_avg = ten_sec_info_Pleth
+    else:
+        tensec_info_avg = (ten_sec_info_ECG + ten_sec_info_Pleth) / 2
 
-    instantaneous_HR = ten_sec_info_avg * 6
 
-    print("10 second instantaneous heart rate is %d bmp." % instantaneous_HR)
+    instantaneous_HR = tensec_info_avg * 6
+
+    print("10 second instantaneous heart rate is %d bmp." % instantaneous_HR, flush = True)
     logging.info("10 sec inst. HR: %d bpm" % instantaneous_HR)
 
     return instantaneous_HR

@@ -1,47 +1,11 @@
 from heart_rate_monitoring import read_data, find_sampfreq, obtain_ECG, obtain_Pleth, \
-estimate_instantaneous_HR, some_min_avg, file_size, heart_rate_insta, alert_brady_tachy, alert_log
+estimate_instantaneous_HR, some_min_avg, file_size, heart_rate_insta, alert_brady_tachy, alert_log, parse_cli, main_arg
 import collections
 import os
 import logging
 from scipy.io import loadmat
 import h5py 
 import sys
-
-def parse_cli():
-    """ argparse capabilites that enables user to input values to change output
-    
-    :param: user inputed values for one or more of filename, bradycardia threshold, tachycardia threshold, signal type, and desired minute HR average
-    :returns: returns args arguments for main method() """ 
-    import argparse as ap
-
-    par = ap.ArgumentParser(description = "run program for inputted binary file", formatter_class = ap.ArgumentDefaultsHelpFormatter)
-
-    par.add_argument("--file", dest = "file", help="input binary file", type = str)
-    par.add_argument("--brady", dest = "brady", help="input bradycardia starting heart rate", type = int, default = 30)
-    par.add_argument("--tachy", dest = "tachy", help="input tachycardia starting heart rate", type = int, default = 240)
-    par.add_argument("--signal", dest = "signal", help="input ECG for ECG signal HR estimation, PLETH for Plethysmograph HR estimation, \
-     or BOTH for an average of both signals HR estimation", type = str, default = "BOTH")
-    par.add_argument("--usermin", dest = "usermin", help="input desired multi-minute heart rate average", type = int, default = 2)
-
-    args = par.parse_args()
-
-    return args
-
-
-def main():
-    """ run all functions of heart_rate_monitoring file
-    
-    :param: arg arguments from argparse
-    :returns: user inputed variables to be inputed into code for specific responses """ 
-    args = parse_cli()
-
-    file = args.file
-    brady = args.brady
-    tachy = args.tachy
-    signal = args.signal
-    usermin = args.usermin
-
-    return file, brady, tachy, signal, usermin
 
 
 if __name__ == "__main__":
@@ -50,7 +14,7 @@ if __name__ == "__main__":
     :param: binary multiplexed data file
     :returns: prints instantaneous heart rate, one minute heart rate, five minute heart rate, and heart rate log in the case of alert """ 
     
-    file, brady, tachy, signal, usermin = main()
+    file, brady, tachy, signal, usermin = main_arg()
 
     logging.basicConfig(level=logging.INFO, filename="log.txt", filemode = 'w', format='%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p')
 
@@ -60,26 +24,6 @@ if __name__ == "__main__":
     onemin_avg_log = collections.deque([], maxlen = 6)
     fivemin_avg_log = collections.deque([], maxlen = 30)
     usermin_avg_log = collections.deque([], maxlen = (usermin*6))
-
-    # try:
-    #     f = loadmat(file)
-    #     d = dict(f)
-    #     ECGvals = d.get('ecg')
-    #     size = len(ECGvals[0])*2
-    # except:
-    #     try: 
-    #         f = h5py.File(file)
-    #         d = dict(f)
-    #         ECGvals = d.get('ecg')
-    #         size = len(ECGvals)*2
-    #     except:
-    #         try:
-    #             f = open(file, "rb")
-    #             f.seek(0, os.SEEK_END)
-    #             bytesize = f.tell()
-    #             size = (bytesize / 2) - 1 
-    #         except IOError:
-    #             print("Could not open file.")
 
     size = file_size(file)
 
@@ -99,14 +43,8 @@ if __name__ == "__main__":
             ten_sec_info_ECG = heart_rate_insta(ECGData)
             ten_sec_info_Pleth = heart_rate_insta(PlethData)
 
-            if(signal == "ECG"):
-                tensec_info_avg = ten_sec_info_ECG
-            elif(signal == "PLETH"):
-                tensec_info_avg = ten_sec_info_Pleth
-            else:
-                tensec_info_avg = (ten_sec_info_ECG + ten_sec_info_Pleth) / 2
-
-            instantaneous_HR = estimate_instantaneous_HR(tensec_info_avg)
+            instantaneous_HR = estimate_instantaneous_HR(signal, ten_sec_info_ECG, ten_sec_info_Pleth)
+            
             tenmin_log.append(instantaneous_HR)
             alert_log(instantaneous_HR, tenmin_log, brady, tachy)
             onemin_avg_log.append(instantaneous_HR)
