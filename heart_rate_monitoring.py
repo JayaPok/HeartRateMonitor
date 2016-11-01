@@ -116,7 +116,7 @@ def read_data(filename, sampfreq, iteration, signal):
             ppvals = d.get('ecg').T.astype(np.float)
         elif signal == "PLETH":
             ecgvals = d.get('pp').T.astype(np.float)
-            ppvals = d.get('pp').T.astype(np.float)            
+            ppvals = d.get('pp').T.astype(np.float)
         else:
             ecgvals = d.get('ecg').T.astype(np.float)
             ppvals = d.get('pp').T.astype(np.float)
@@ -142,7 +142,7 @@ def read_data(filename, sampfreq, iteration, signal):
                 ppvals = d.get('ecg')[0].T.astype(np.float)
             elif signal == "PLETH":
                 ecgvals = d.get('pp')[0].T.astype(np.float)
-                ppvals = d.get('pp')[0].T.astype(np.float)            
+                ppvals = d.get('pp')[0].T.astype(np.float)
             else:
                 ecgvals = d.get('ecg')[0].T.astype(np.float)
                 ppvals = d.get('pp')[0].T.astype(np.float)
@@ -287,7 +287,8 @@ def estimate_instantaneous_HR(signal, ten_sec_info_ECG, ten_sec_info_Pleth):
 def alert_brady_tachy(tenmin_log):
     """ bradycardia/tachycardia alert
 
-    :param tenmin_log: log containing up to last 60 values of past 10 seconds of HR data
+    :param tenmin_log: log containing up to last 60 values of past 10 seconds
+     of HR data
     :return tenmin_log_vals: ten minute log in the form of a list
     """
 
@@ -300,7 +301,8 @@ def alert_log(instantaneous_HR, tenmin_log, brady, tachy):
     """ ten minute log output in the case of bradycardia or tachycardia
 
     :param instantaneous_HR: heart rate obtained from previous 10 seconds of HR data
-    :param tenmin_log: log containing up to last 60 values of past 10 seconds of HR data
+    :param tenmin_log: log containing up to last 60 values of past 10 seconds of
+     HR data
     :param brady: heart rate value representing bradycardia
     :param tachy: heart rate value representing tachycardia
     :return: prints log in case of alarm
