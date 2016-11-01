@@ -294,14 +294,22 @@ def some_min_avg(onemin_avg_log, fivemin_avg_log, usermin_avg_log, usermin):
         onemin_avg = sum(onemin_avg_log) / len(onemin_avg_log)
         print("1 minute average heart rate is %d." % onemin_avg, flush=True)
         logging.info("1 min. avg. HR: %d bpm" % onemin_avg)
+    else:
+        onemin_avg = None
 
     if len(fivemin_avg_log) == 30:
         fivemin_avg = sum(fivemin_avg_log) / len(fivemin_avg_log)
         print("5 minute average heart rate is %d." % fivemin_avg, flush=True)
         logging.info("5 min. avg. HR: %d bpm" % fivemin_avg)
+    else:
+        fivemin_avg = None
 
     if len(usermin_avg_log) == (usermin*6):
         usermin_avg = sum(usermin_avg_log) / len(usermin_avg_log)
         print("%d minute average heart rate is %d." % (usermin, usermin_avg),
               flush=True)
         logging.info("%d min. avg. HR: %d bpm" % (usermin, usermin_avg))
+    else:
+        usermin_avg = None
+
+    return onemin_avg, fivemin_avg, usermin_avg
