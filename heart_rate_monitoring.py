@@ -38,20 +38,24 @@ def main_arg():
     return file, brady, tachy, signal, usermin
 
 def file_size(file):
+    """ determine size of matlab, hd5f, or binary file
+    
+    :param: file
+    :returns: size of file """
     import os
     from scipy.io import loadmat 
     import h5py 
     try:
         f = loadmat(file)
         d = dict(f)
-        ECGvals = d.get('ecg')
+        ECGvals = (d.get('ecg').T).astype(np.float)
         size = len(ECGvals[0])*2
         return size
     except:
         try: 
             f = h5py.File(file)
             d = dict(f)
-            ECGvals = d.get('ecg')
+            ECGvals = (d.get('ecg')[0].T).astype(np.float)
             size = len(ECGvals)*2
             return size
         except:
@@ -77,11 +81,11 @@ def read_data(filename, SampFreq, iteration):
         f = loadmat(filename)
         d = dict(f)
 
-        ECGvals = d.get('ecg')
-        PPvals = d.get('pp')
+        ECGvals = (d.get('ecg').T).astype(np.float)
+        PPvals = (d.get('pp').T).astype(np.float)
         tensec_data = np.array([])
 
-        i = 10*SampFreq*(iteration-1)
+        i = int(10*SampFreq*(iteration-1))
 
         while(i < 10*SampFreq*iteration):
             tensec_data = np.append(tensec_data, np.round(PPvals[0][i], 1))
@@ -94,12 +98,12 @@ def read_data(filename, SampFreq, iteration):
         try:
             f = h5py.File(filename)
             d = dict(f)
-
-            ECGvals = d.get('ecg')
-            PPvals = d.get('pp')
+            
+            ECGvals = (d.get('ecg')[0].T).astype(np.float)
+            PPvals = (d.get('pp')[0].T).astype(np.float)
             tensec_data = np.array([])
 
-            i = 10*SampFreq*(iteration-1)
+            i = int(10*SampFreq*(iteration-1))
 
             while(i < 10*SampFreq*iteration):
                 tensec_data = np.append(tensec_data, np.round(PPvals[i], 1))
@@ -136,15 +140,15 @@ def find_sampfreq(filename):
     try:
         f = loadmat(filename)
         d = dict(f)
-        SampFreq = d.get('fs')
+        SampFreq = (d.get('fs')).astype(np.float)
         SampFreq = SampFreq[0][0]
         return SampFreq
     except:
         try:
             f = h5py.File(filename)
             d = dict(f)
-            SampFreq = d.get('fs')
-            SampFreq = SampFreq[0][0]
+            SampFreq = (d.get('fs')[0]).astype(np.float)
+            SampFreq = SampFreq[0]
 
             return SampFreq
         except:
