@@ -238,16 +238,16 @@ def alert_log(instantaneous_HR, tenmin_log, brady, tachy):
     """
     if(instantaneous_HR < brady):
         tenmin_log_brady = alert_brady_tachy(tenmin_log)
-        print("Alert, bradycardia detected! Here is 10 minute backlog: ")
-        print(tenmin_log_brady)
+        print("Alert, bradycardia detected! Here is 10 minute backlog: ", flush = True)
+        print(tenmin_log_brady, flush = True)
         logging.warning("Alert, bradycardia detected! Here is 10 minute backlog: ")
         logging.warning(tenmin_log_brady)
 
 
     if(instantaneous_HR > tachy):
         tenmin_log_tachy = alert_brady_tachy(tenmin_log)
-        print("Alert, tachycardia detected! Here is 10 minute backlog: ")
-        print(tenmin_log_tachy)
+        print("Alert, tachycardia detected! Here is 10 minute backlog: ", flush = True)
+        print(tenmin_log_tachy, flush = True)
         logging.warning("Alert, tachycardia detected! Here is 10 minute backlog: ")
         logging.warning(tenmin_log_tachy)
 
@@ -261,17 +261,17 @@ def some_min_avg(onemin_avg_log, fivemin_avg_log, usermin_avg_log, usermin):
 
     if(len(onemin_avg_log) == 6):
         onemin_avg = sum(onemin_avg_log) / len(onemin_avg_log)
-        print("1 minute average heart rate is %d." % onemin_avg)
+        print("1 minute average heart rate is %d." % onemin_avg, flush = True)
         logging.info("1 min. avg. HR: %d bpm" % onemin_avg)
 
     if(len(fivemin_avg_log) == 30):
         fivemin_avg = sum(fivemin_avg_log) / len(fivemin_avg_log)
-        print("5 minute average heart rate is %d." % fivemin_avg)
+        print("5 minute average heart rate is %d." % fivemin_avg, flush = True)
         logging.info("5 min. avg. HR: %d bpm" % fivemin_avg)
 
     if(len(usermin_avg_log) == (usermin*6)):
         usermin_avg = sum(usermin_avg_log) / len(usermin_avg_log)
-        print("%d minute average heart rate is %d." % (usermin, usermin_avg))
+        print("%d minute average heart rate is %d." % (usermin, usermin_avg), flush = True)
         logging.info("%d min. avg. HR: %d bpm" % (usermin, usermin_avg))
 
 
