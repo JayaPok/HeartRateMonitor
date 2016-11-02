@@ -30,6 +30,4 @@ numpy - utilize MATLAB commands and features in the python environment
 
 6. h5py - allows for reading HDF5 files
 
-
-Notes:
-Peak detection still not refined and fully functional.
+7. sys - allows for exiting out of lab

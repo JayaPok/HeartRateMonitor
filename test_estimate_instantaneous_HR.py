@@ -1,4 +1,5 @@
-from heart_rate_monitoring import heart_rate_indicies_Plethysmograph, estimate_instantaneous_HR
+from heart_rate_monitoring import heart_rate_insta, estimate_instantaneous_HR
+
 
 def test_estimate_instantaneous_HR():
     """ test estimate_instantaneous_HR() method
@@ -9,13 +10,12 @@ def test_estimate_instantaneous_HR():
 
     import numpy as np
     Fs = 80
-    sample = 80
-    f = 5
+    sample = 8000
     x = np.arange(sample)
-    y = np.array(np.sin(2 * np.pi * f * x / Fs))
+    y = np.array(np.sin(2 * np.pi * x / Fs))
 
 
-    instantaneous_HR_indicies_Pleth = [4, 20, 36, 52, 68]
-    instantaenous_HR = estimate_instantaneous_HR(instantaneous_HR_indicies_Pleth, Fs)
+    heart_rate_length = heart_rate_insta(y)
+    instantaneous_HR = estimate_instantaneous_HR("ECG", heart_rate_length, heart_rate_length)
 
-    assert instantaenous_HR == 300
+    assert instantaneous_HR == 600
